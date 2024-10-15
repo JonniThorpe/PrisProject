@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador</title>
+
+    <style>
+        /* Importar fuente de Google */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+        /* Definir variables de colores */
+        :root {
+            --color-primary: #6C9BCF;
+            --color-danger: #FF0060;
+            --color-success: #1B9C85;
+            --color-warning: #F7D060;
+            --color-white: #fff;
+            --color-info-dark: #7d8da1;
+            --color-dark: #363949;
+            --color-light: rgba(132, 139, 200, 0.18);
+            --color-dark-variant: #677483;
+            --color-background: #f6f6f9;
+
+            --card-border-radius: 2rem;
+            --border-radius-1: 0.4rem;
+            --border-radius-2: 1.2rem;
+
+            --card-padding: 1.8rem;
+            --padding-1: 1.2rem;
+
+            --box-shadow: 0 2rem 3rem var(--color-light);
+        }
+
+        /* Variables para modo oscuro */
+        .dark-mode-variables {
+            --color-background: #181a1e;
+            --color-white: #202528;
+            --color-dark: #edeffd;
+            --color-dark-variant: #a3bdcc;
+            --color-light: rgba(0, 0, 0, 0.4);
+            --box-shadow: 0 2rem 3rem var(--color-light);
+        }
+
+        /* Reiniciar márgenes y box-sizing */
+        * {
+            margin: 0;
+            padding: 0;
+            outline: 0;
+            appearance: 0;
+            border: 0;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            user-select: none;
+            overflow-x: hidden;
+            color: var(--color-dark);
+            background-color: var(--color-background);
+        }
+
+        /* Estilo del encabezado */
+        header {
+            color: var(--color-dark);
+            padding: 5px 20px;
+            text-align: left;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        /* Diseño principal */
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start; /* Cambiado de space-around a flex-start */
+            padding: 20px;
+        }
+
+        /* Paneles generales */
+        section {
+            background-color: var(--color-white);
+            padding: var(--card-padding);
+            margin: 10px;
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--box-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1 1 45%; /* Flexibilidad para ser responsive */
+            max-width: 45%;
+        }
+
+        /* Cambiamos el hover para las secciones */
+        section:hover {
+            box-shadow: none; /* Sombra más intensa al pasar el mouse */
+        }
+
+        /* Responsive para dispositivos pequeños */
+        @media (max-width: 768px) {
+            section {
+                flex-basis: 100%; /* Los paneles ocupan todo el ancho en pantallas pequeñas */
+                max-width: 100%;
+            }
+
+            header {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Estilo de los botones */
+        button {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius-1);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--color-light);
+        }
+
+        /* Títulos de las secciones */
+        h2, h3 {
+            margin-bottom: 15px;
+            color: var(--color-dark);
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* Listas de proyectos y tareas */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: var(--color-background);
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: var(--border-radius-1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        ul li:hover {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        /* Sección oculta de formularios y listas */
+        .hidden {
+            display: none;
+        }
+
+        /* Formularios dentro de las vistas */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        form input {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius-1);
+        }
+
+        /* Botones adicionales en la vista de proyecto */
+        .project-details button {
+            margin-right: 10px;
+        }
+
+        /* Estilo de las listas internas en los detalles del proyecto */
+        .project-details ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        .project-details li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Título del proyecto seleccionado */
+        #projectTitle {
+            color: var(--color-primary);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        /* Ajustar elementos internos en pantallas más pequeñas */
+        @media (max-width: 480px) {
+            button {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+
+            ul li {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            h2, h3 {
+                font-size: 1.2rem;
+            }
+
+            form input {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <h1>Panel Administrador</h1>
+</header>
+
+<main class="admin-panel">
+    <section class="create-project">
+        <h2>Crear un nuevo proyecto</h2>
+        <button id="createProjectBtn">Crear Proyecto</button>
+    </section>
+
+    <section class="project-list">
+        <h2>Proyectos disponibles</h2>
+        <ul>
+            <li class="project-item" onclick="showProjectDetails('Proyecto 1')">Proyecto 1</li>
+            <li class="project-item" onclick="showProjectDetails('Proyecto 2')">Proyecto 2</li>
+            <li class="project-item" onclick="showProjectDetails('Proyecto 3')">Proyecto 3</li>
+        </ul>
+    </section>
+</main>
+
+<section id="projectDetails" class="project-details hidden">
+    <h2>Vista del Proyecto: <span id="projectTitle">Nombre del proyecto</span></h2>
+
+    <button id="addClientBtn">Añadir Cliente</button>
+    <button id="addTaskBtn">Añadir Tarea</button>
+    <button id="addBudgetBtn">Añadir Presupuesto</button>
+
+    <!-- Opciones adicionales -->
+    <button id="viewTasksBtn">Ver Tareas</button>
+    <button id="viewRatingsBtn">Ver Valoraciones</button>
+    <button id="viewResultBtn">Ver Cálculo del Resultado</button>
+
+    <!-- Sección para añadir clientes -->
+    <div id="clientList" class="hidden">
+        <h3>Seleccionar Cliente</h3>
+        <ul>
+            <li>Cliente 1</li>
+            <li>Cliente 2</li>
+            <li>Cliente 3</li>
+        </ul>
+    </div>
+
+    <!-- Formulario para añadir tareas -->
+    <div id="taskForm" class="hidden">
+        <h3>Añadir Tarea</h3>
+        <form>
+            <label for="taskName">Nombre de la tarea:</label>
+            <input type="text" id="taskName">
+            <label for="taskEffort">Esfuerzo:</label>
+            <input type="number" id="taskEffort">
+            <button type="submit">Añadir Tarea</button>
+        </form>
+    </div>
+
+    <!-- Formulario para añadir tareas -->
+    <div id="budgetForm" class="hidden">
+        <h3>Añadir Presupuesto</h3>
+        <form>
+            <label for="projectBudget">Presupuesto:</label>
+            <input type="number" id="projectBudget">
+            <button type="submit">Ajustar Presupuesto</button>
+        </form>
+    </div>
+
+    <!-- Ver tareas asignadas a clientes -->
+    <div id="taskList" class="hidden">
+        <h3>Tareas y Clientes</h3>
+        <ul>
+            <li>Tarea 1 - Cliente 1</li>
+            <li>Tarea 2 - Cliente 2</li>
+            <li>Tarea 3 - Cliente 3</li>
+        </ul>
+    </div>
+
+    <!-- Ver valoraciones de clientes -->
+    <div id="ratingList" class="hidden">
+        <h3>Valoraciones de Clientes</h3>
+        <ul>
+            <li>Cliente 1 - No ha valorado</li>
+            <li>Cliente 2 - Ha valorado</li>
+            <li>Cliente 3 - No ha valorado</li>
+        </ul>
+    </div>
+
+    <!-- Ver cálculo del resultado -->
+    <div id="resultCalculation" class="hidden">
+        <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
+        <ul>
+            <li>Tarea 1 - 70% Importancia - Valoración Cliente: 4/5</li>
+            <li>Tarea 2 - 50% Importancia - Valoración Cliente: 3/5</li>
+            <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
+        </ul>
+    </div>
+
+</section>
+
+<script>
+    // Función para ocultar todas las secciones dentro de la vista del proyecto
+    function hideAllSections() {
+        document.getElementById('clientList').classList.add('hidden');
+        document.getElementById('taskForm').classList.add('hidden');
+        document.getElementById('taskList').classList.add('hidden');
+        document.getElementById('ratingList').classList.add('hidden');
+        document.getElementById('resultCalculation').classList.add('hidden');
+    }
+
+    // Mostrar los detalles del proyecto seleccionado
+    function showProjectDetails(projectName) {
+        const projectDetails = document.getElementById('projectDetails');
+        const projectTitle = document.getElementById('projectTitle');
+
+        if (projectTitle.innerText === projectName && !projectDetails.classList.contains('hidden')) {
+            projectDetails.classList.add('hidden');
+        } else {
+            projectTitle.innerText = projectName;
+            projectDetails.classList.remove('hidden');
+            hideAllSections(); // Ocultar todas las secciones cuando se abre un nuevo proyecto
+        }
+    }
+
+    // Mostrar lista de clientes al hacer clic en "Añadir Cliente"
+    document.getElementById('addClientBtn').addEventListener('click', function() {
+        const clientList = document.getElementById('clientList');
+        if (clientList.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            clientList.classList.remove('hidden');
+        } else {
+            clientList.classList.add('hidden');
+        }
+    });
+
+    // Mostrar formulario de tareas al hacer clic en "Añadir Tarea"
+    document.getElementById('addTaskBtn').addEventListener('click', function() {
+        const taskForm = document.getElementById('taskForm');
+        if (taskForm.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            taskForm.classList.remove('hidden');
+        } else {
+            taskForm.classList.add('hidden');
+        }
+    });
+
+
+    // Mostrar formulario de tareas al hacer clic en "Añadir Presupuesto"
+    document.getElementById('addBudgetBtn').addEventListener('click', function() {
+        const budgetForm = document.getElementById('budgetForm');
+        if (budgetForm.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            budgetForm.classList.remove('hidden');
+        } else {
+            budgetForm.classList.add('hidden');
+        }
+    });
+
+    // Mostrar tareas del proyecto al hacer clic en "Ver Tareas"
+    document.getElementById('viewTasksBtn').addEventListener('click', function() {
+        const taskList = document.getElementById('taskList');
+        if (taskList.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            taskList.classList.remove('hidden');
+        } else {
+            taskList.classList.add('hidden');
+        }
+    });
+
+    // Mostrar valoraciones de clientes al hacer clic en "Ver Valoraciones"
+    document.getElementById('viewRatingsBtn').addEventListener('click', function() {
+        const ratingList = document.getElementById('ratingList');
+        if (ratingList.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            ratingList.classList.remove('hidden');
+        } else {
+            ratingList.classList.add('hidden');
+        }
+    });
+
+    // Mostrar cálculo del resultado al hacer clic en "Ver Cálculo del Resultado"
+    document.getElementById('viewResultBtn').addEventListener('click', function() {
+        const resultCalculation = document.getElementById('resultCalculation');
+        if (resultCalculation.classList.contains('hidden')) {
+            hideAllSections(); // Ocultar otras secciones
+            resultCalculation.classList.remove('hidden');
+        } else {
+            resultCalculation.classList.add('hidden');
+        }
+    });
+
+</script>
+</body>
+</html>
