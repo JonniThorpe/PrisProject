@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class CreateController {
 
-    @GetMapping("/create.html   ")
+    @GetMapping("/create")
     public String mostrarPaginaDestino() {
         return "create";  // Thymeleaf buscará automáticamente en /templates/create.html
     }
