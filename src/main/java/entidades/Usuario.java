@@ -18,8 +18,11 @@ public class Usuario {
     @Column(name = "Rol", length = 45)
     private String rol;
 
-    @ManyToMany(mappedBy = "usuarioIdusuario")
+    @OneToMany(mappedBy = "usuarioIdusuario")
     private Set<Proyecto> proyectos = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "usuarioIdusuario")
+    private Set<ProyectoHasUsuario> proyectoHasUsuarios = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "usuarioIdusuario")
     private Set<UsuarioValoraTarea> usuarioValoraTareas = new LinkedHashSet<>();
@@ -54,6 +57,14 @@ public class Usuario {
 
     public void setProyectos(Set<Proyecto> proyectos) {
         this.proyectos = proyectos;
+    }
+
+    public Set<ProyectoHasUsuario> getProyectoHasUsuarios() {
+        return proyectoHasUsuarios;
+    }
+
+    public void setProyectoHasUsuarios(Set<ProyectoHasUsuario> proyectoHasUsuarios) {
+        this.proyectoHasUsuarios = proyectoHasUsuarios;
     }
 
     public Set<UsuarioValoraTarea> getUsuarioValoraTareas() {

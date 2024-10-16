@@ -7,29 +7,29 @@ import jakarta.persistence.*;
 public class UsuarioValoraTarea {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Clave primaria simple, generada automáticamente
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Usuario_idUsuario", nullable = false)
-    private Usuario usuario;
+    private Usuario usuarioIdusuario;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Tarea_idTarea", nullable = false)
-    private Tarea tarea;
+    private Tarea tareaIdtarea;
 
     @Column(name = "Valoracion")
     private Integer valoracion;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
-    private Proyecto proyecto;
+    private Proyecto proyectoIdproyecto;
 
     @Column(name = "Valorada")
     private Byte valorada;
 
     // Getters y setters
-
     public Long getId() {
         return id;
     }
@@ -38,20 +38,20 @@ public class UsuarioValoraTarea {
         this.id = id;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Usuario getUsuarioIdusuario() {
+        return usuarioIdusuario;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuarioIdusuario(Usuario usuarioIdusuario) {
+        this.usuarioIdusuario = usuarioIdusuario;
     }
 
-    public Tarea getTarea() {
-        return tarea;
+    public Tarea getTareaIdtarea() {
+        return tareaIdtarea;
     }
 
-    public void setTarea(Tarea tarea) {
-        this.tarea = tarea;
+    public void setTareaIdtarea(Tarea tareaIdtarea) {
+        this.tareaIdtarea = tareaIdtarea;
     }
 
     public Integer getValoracion() {
@@ -62,12 +62,12 @@ public class UsuarioValoraTarea {
         this.valoracion = valoracion;
     }
 
-    public Proyecto getProyecto() {
-        return proyecto;
+    public Proyecto getProyectoIdproyecto() {
+        return proyectoIdproyecto;
     }
 
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
+    public void setProyectoIdproyecto(Proyecto proyectoIdproyecto) {
+        this.proyectoIdproyecto = proyectoIdproyecto;
     }
 
     public Byte getValorada() {
