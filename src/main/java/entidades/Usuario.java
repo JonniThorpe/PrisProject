@@ -15,6 +15,9 @@ public class Usuario {
     @Column(name = "Nombre", length = 45)
     private String nombre;
 
+    @Column(name = "Contraseña", length = 45)
+    private String password;
+
     @Column(name = "Rol", length = 45)
     private String rol;
 
@@ -41,6 +44,14 @@ public class Usuario {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getRol() {
