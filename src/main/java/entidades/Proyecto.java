@@ -2,7 +2,6 @@ package entidades;
 
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -17,9 +16,6 @@ public class Proyecto {
     @Column(name = "Nombre", nullable = false, length = 45)
     private String nombre;
 
-    @Column(name = "Resultado", precision = 2)
-    private BigDecimal resultado;
-
     @Column(name = "Fecha_Creacion")
     private Instant fechaCreacion;
 
@@ -30,15 +26,11 @@ public class Proyecto {
     @JoinColumn(name = "Usuario_idUsuario", nullable = false)
     private Usuario usuarioIdusuario;
 
-    @ManyToMany
-    @JoinTable(name = "proyecto_has_tarea",
-            inverseJoinColumns = @JoinColumn(name = "Tarea_idTarea"))
-    private Set<Tarea> tareas = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "proyectoIdproyecto")
+    private Set<ProyectoHasTarea> proyectoHasTareas = new LinkedHashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "proyecto_has_usuario",
-            inverseJoinColumns = @JoinColumn(name = "Usuario_idUsuario"))
-    private Set<Usuario> usuarios = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "proyectoIdproyecto")
+    private Set<ProyectoHasUsuario> proyectoHasUsuarios = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "proyectoIdproyecto")
     private Set<UsuarioValoraTarea> usuarioValoraTareas = new LinkedHashSet<>();
@@ -57,14 +49,6 @@ public class Proyecto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public BigDecimal getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(BigDecimal resultado) {
-        this.resultado = resultado;
     }
 
     public Instant getFechaCreacion() {
@@ -91,20 +75,20 @@ public class Proyecto {
         this.usuarioIdusuario = usuarioIdusuario;
     }
 
-    public Set<Tarea> getTareas() {
-        return tareas;
+    public Set<ProyectoHasTarea> getProyectoHasTareas() {
+        return proyectoHasTareas;
     }
 
-    public void setTareas(Set<Tarea> tareas) {
-        this.tareas = tareas;
+    public void setProyectoHasTareas(Set<ProyectoHasTarea> proyectoHasTareas) {
+        this.proyectoHasTareas = proyectoHasTareas;
     }
 
-    public Set<Usuario> getUsuarios() {
-        return usuarios;
+    public Set<ProyectoHasUsuario> getProyectoHasUsuarios() {
+        return proyectoHasUsuarios;
     }
 
-    public void setUsuarios(Set<Usuario> usuarios) {
-        this.usuarios = usuarios;
+    public void setProyectoHasUsuarios(Set<ProyectoHasUsuario> proyectoHasUsuarios) {
+        this.proyectoHasUsuarios = proyectoHasUsuarios;
     }
 
     public Set<UsuarioValoraTarea> getUsuarioValoraTareas() {

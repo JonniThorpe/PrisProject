@@ -7,19 +7,25 @@ import jakarta.persistence.*;
 public class ProyectoHasTarea {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Clave primaria simple, generada automáticamente
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
-    private Proyecto proyecto;
+    private Proyecto proyectoIdproyecto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Tarea_idTarea", nullable = false)
-    private Tarea tarea;
+    private Tarea tareaIdtarea;
+
+    @Column(name = "Satisfaccion")
+    private Double satisfaccion;
+
+    @Column(name = "Esfuerzo")
+    private Integer esfuerzo;
 
     // Getters y setters
-
     public Long getId() {
         return id;
     }
@@ -28,19 +34,35 @@ public class ProyectoHasTarea {
         this.id = id;
     }
 
-    public Proyecto getProyecto() {
-        return proyecto;
+    public Proyecto getProyectoIdproyecto() {
+        return proyectoIdproyecto;
     }
 
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
+    public void setProyectoIdproyecto(Proyecto proyectoIdproyecto) {
+        this.proyectoIdproyecto = proyectoIdproyecto;
     }
 
-    public Tarea getTarea() {
-        return tarea;
+    public Tarea getTareaIdtarea() {
+        return tareaIdtarea;
     }
 
-    public void setTarea(Tarea tarea) {
-        this.tarea = tarea;
+    public void setTareaIdtarea(Tarea tareaIdtarea) {
+        this.tareaIdtarea = tareaIdtarea;
+    }
+
+    public Double getSatisfaccion() {
+        return satisfaccion;
+    }
+
+    public void setSatisfaccion(Double satisfaccion) {
+        this.satisfaccion = satisfaccion;
+    }
+
+    public Integer getEsfuerzo() {
+        return esfuerzo;
+    }
+
+    public void setEsfuerzo(Integer esfuerzo) {
+        this.esfuerzo = esfuerzo;
     }
 }
