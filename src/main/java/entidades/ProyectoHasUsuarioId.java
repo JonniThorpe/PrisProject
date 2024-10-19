@@ -7,6 +7,7 @@ import org.hibernate.Hibernate;
 import java.io.Serializable;
 import java.util.Objects;
 
+
 @Embeddable
 public class ProyectoHasUsuarioId implements Serializable {
     private static final long serialVersionUID = 9101389567335261405L;

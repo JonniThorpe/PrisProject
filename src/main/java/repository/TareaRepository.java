@@ -1,4 +1,4 @@
-package dao;
+package repository;
 
 import entidades.Tarea;
 import org.springframework.data.jpa.repository.Query;
