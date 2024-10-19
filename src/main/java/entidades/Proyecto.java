@@ -27,13 +27,10 @@ public class Proyecto {
     private Usuario usuarioIdusuario;
 
     @OneToMany(mappedBy = "proyectoIdproyecto")
-    private Set<ProyectoHasTarea> proyectoHasTareas = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "proyectoIdproyecto")
     private Set<ProyectoHasUsuario> proyectoHasUsuarios = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "proyectoIdproyecto")
-    private Set<UsuarioValoraTarea> usuarioValoraTareas = new LinkedHashSet<>();
+    private Set<Tarea> tareas = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -75,14 +72,6 @@ public class Proyecto {
         this.usuarioIdusuario = usuarioIdusuario;
     }
 
-    public Set<ProyectoHasTarea> getProyectoHasTareas() {
-        return proyectoHasTareas;
-    }
-
-    public void setProyectoHasTareas(Set<ProyectoHasTarea> proyectoHasTareas) {
-        this.proyectoHasTareas = proyectoHasTareas;
-    }
-
     public Set<ProyectoHasUsuario> getProyectoHasUsuarios() {
         return proyectoHasUsuarios;
     }
@@ -91,12 +80,12 @@ public class Proyecto {
         this.proyectoHasUsuarios = proyectoHasUsuarios;
     }
 
-    public Set<UsuarioValoraTarea> getUsuarioValoraTareas() {
-        return usuarioValoraTareas;
+    public Set<Tarea> getTareas() {
+        return tareas;
     }
 
-    public void setUsuarioValoraTareas(Set<UsuarioValoraTarea> usuarioValoraTareas) {
-        this.usuarioValoraTareas = usuarioValoraTareas;
+    public void setTareas(Set<Tarea> tareas) {
+        this.tareas = tareas;
     }
 
 }

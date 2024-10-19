@@ -15,11 +15,11 @@ public class Usuario {
     @Column(name = "Nombre", length = 45)
     private String nombre;
 
-    @Column(name = "Contraseña", length = 45)
-    private String password;
-
     @Column(name = "Rol", length = 45)
     private String rol;
+
+    @Column(name = "`Contraseña`", nullable = false, length = 45)
+    private String contraseña;
 
     @OneToMany(mappedBy = "usuarioIdusuario")
     private Set<Proyecto> proyectos = new LinkedHashSet<>();
@@ -46,20 +46,20 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getRol() {
         return rol;
     }
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
     }
 
     public Set<Proyecto> getProyectos() {

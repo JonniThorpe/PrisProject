@@ -18,8 +18,15 @@ public class Tarea {
     @Column(name = "Descripcion", length = 45)
     private String descripcion;
 
-    @OneToMany(mappedBy = "tareaIdtarea")
-    private Set<ProyectoHasTarea> proyectoHasTareas = new LinkedHashSet<>();
+    @Column(name = "Satisfaccion")
+    private Double satisfaccion;
+
+    @Column(name = "Esfuerzo", nullable = false)
+    private Integer esfuerzo;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
+    private Proyecto proyectoIdproyecto;
 
     @OneToMany(mappedBy = "tareaIdtarea")
     private Set<UsuarioValoraTarea> usuarioValoraTareas = new LinkedHashSet<>();
@@ -48,12 +55,28 @@ public class Tarea {
         this.descripcion = descripcion;
     }
 
-    public Set<ProyectoHasTarea> getProyectoHasTareas() {
-        return proyectoHasTareas;
+    public Double getSatisfaccion() {
+        return satisfaccion;
     }
 
-    public void setProyectoHasTareas(Set<ProyectoHasTarea> proyectoHasTareas) {
-        this.proyectoHasTareas = proyectoHasTareas;
+    public void setSatisfaccion(Double satisfaccion) {
+        this.satisfaccion = satisfaccion;
+    }
+
+    public Integer getEsfuerzo() {
+        return esfuerzo;
+    }
+
+    public void setEsfuerzo(Integer esfuerzo) {
+        this.esfuerzo = esfuerzo;
+    }
+
+    public Proyecto getProyectoIdproyecto() {
+        return proyectoIdproyecto;
+    }
+
+    public void setProyectoIdproyecto(Proyecto proyectoIdproyecto) {
+        this.proyectoIdproyecto = proyectoIdproyecto;
     }
 
     public Set<UsuarioValoraTarea> getUsuarioValoraTareas() {

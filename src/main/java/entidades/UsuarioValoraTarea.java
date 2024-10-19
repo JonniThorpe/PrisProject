@@ -5,16 +5,15 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "usuario_valora_tarea")
 public class UsuarioValoraTarea {
+    @EmbeddedId
+    private UsuarioValoraTareaId id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Clave primaria simple, generada automáticamente
-    @Column(name = "id")
-    private Long id;
-
+    @MapsId("usuarioIdusuario")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Usuario_idUsuario", nullable = false)
     private Usuario usuarioIdusuario;
 
+    @MapsId("tareaIdtarea")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Tarea_idTarea", nullable = false)
     private Tarea tareaIdtarea;
@@ -22,19 +21,14 @@ public class UsuarioValoraTarea {
     @Column(name = "Valoracion")
     private Integer valoracion;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
-    private Proyecto proyectoIdproyecto;
-
     @Column(name = "Valorada")
     private Byte valorada;
 
-    // Getters y setters
-    public Long getId() {
+    public UsuarioValoraTareaId getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UsuarioValoraTareaId id) {
         this.id = id;
     }
 
@@ -62,14 +56,6 @@ public class UsuarioValoraTarea {
         this.valoracion = valoracion;
     }
 
-    public Proyecto getProyectoIdproyecto() {
-        return proyectoIdproyecto;
-    }
-
-    public void setProyectoIdproyecto(Proyecto proyectoIdproyecto) {
-        this.proyectoIdproyecto = proyectoIdproyecto;
-    }
-
     public Byte getValorada() {
         return valorada;
     }
@@ -77,4 +63,5 @@ public class UsuarioValoraTarea {
     public void setValorada(Byte valorada) {
         this.valorada = valorada;
     }
+
 }
