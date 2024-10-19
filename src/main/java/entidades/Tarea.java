@@ -18,11 +18,8 @@ public class Tarea {
     @Column(name = "Descripcion", length = 45)
     private String descripcion;
 
-    @Column(name = "Esfuerzo", length = 45)
-    private String esfuerzo;
-
-    @ManyToMany(mappedBy = "tareas")
-    private Set<Proyecto> proyectos = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "tareaIdtarea")
+    private Set<ProyectoHasTarea> proyectoHasTareas = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "tareaIdtarea")
     private Set<UsuarioValoraTarea> usuarioValoraTareas = new LinkedHashSet<>();
@@ -51,20 +48,12 @@ public class Tarea {
         this.descripcion = descripcion;
     }
 
-    public String getEsfuerzo() {
-        return esfuerzo;
+    public Set<ProyectoHasTarea> getProyectoHasTareas() {
+        return proyectoHasTareas;
     }
 
-    public void setEsfuerzo(String esfuerzo) {
-        this.esfuerzo = esfuerzo;
-    }
-
-    public Set<Proyecto> getProyectos() {
-        return proyectos;
-    }
-
-    public void setProyectos(Set<Proyecto> proyectos) {
-        this.proyectos = proyectos;
+    public void setProyectoHasTareas(Set<ProyectoHasTarea> proyectoHasTareas) {
+        this.proyectoHasTareas = proyectoHasTareas;
     }
 
     public Set<UsuarioValoraTarea> getUsuarioValoraTareas() {
