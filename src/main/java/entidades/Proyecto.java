@@ -10,7 +10,8 @@ import java.util.Set;
 @Table(name = "proyecto")
 public class Proyecto {
     @Id
-    @Column(name = "idProyecto", nullable = false)
+    @Column(name = "id_proyecto", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "Nombre", nullable = false, length = 45)
@@ -19,11 +20,11 @@ public class Proyecto {
     @Column(name = "Fecha_Creacion")
     private Instant fechaCreacion;
 
-    @Column(name = "PesoMaximoTareas")
+    @Column(name = "peso_maximo_tareas")
     private Integer pesoMaximoTareas;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_idUsuario", nullable = false)
+    @JoinColumn(name = "Usuario_id_usuario", nullable = false)
     private Usuario usuarioIdusuario;
 
     @OneToMany(mappedBy = "proyectoIdproyecto")

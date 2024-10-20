@@ -11,10 +11,10 @@ import java.util.Objects;
 @Embeddable
 public class ProyectoHasUsuarioId implements Serializable {
     private static final long serialVersionUID = 9101389567335261405L;
-    @Column(name = "Proyecto_idProyecto", nullable = false)
+    @Column(name = "proyecto_id_proyecto", nullable = false)
     private Integer proyectoIdproyecto;
 
-    @Column(name = "Usuario_idUsuario", nullable = false)
+    @Column(name = "usuario_id_usuario", nullable = false)
     private Integer usuarioIdusuario;
 
     public Integer getProyectoIdproyecto() {

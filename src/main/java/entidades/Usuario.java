@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name = "usuario")
 public class Usuario {
     @Id
-    @Column(name = "idUsuario", nullable = false)
+    @Column(name = "id_usuario", nullable = false)
     private Integer id;
 
     @Column(name = "Nombre", length = 45)

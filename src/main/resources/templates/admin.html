@@ -26,11 +26,14 @@
     <section class="project-list">
         <h2>Proyectos disponibles</h2>
         <ul>
-            <li class="project-item" onclick="showProjectDetails('Proyecto 1')">Proyecto 1</li>
-            <li class="project-item" onclick="showProjectDetails('Proyecto 2')">Proyecto 2</li>
-            <li class="project-item" onclick="showProjectDetails('Proyecto 3')">Proyecto 3</li>
+            <!-- Itera sobre la lista de proyectos y genera cada proyecto como un item en la lista -->
+            <li class="project-item" th:each="proyecto : ${proyectos}"
+                th:data-project-name="${proyecto.nombre}"
+                th:text="${proyecto.nombre}"></li>
         </ul>
     </section>
+
+
 </main>
 
 <section id="projectDetails" class="project-details hidden">
@@ -102,8 +105,8 @@
 
 </section>
 
-<script th:src="@{/index.js}"></script>
-<script src="/src/main/resources/static/index.js"></script>
+<script th:src="@{/admin.js}"></script>
+<script src="/src/main/resources/static/admin.js"></script>
 
 </body>
 </html>

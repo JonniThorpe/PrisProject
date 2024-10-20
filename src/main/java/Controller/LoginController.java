@@ -23,7 +23,7 @@ public class LoginController {
     @GetMapping("/login")
     public String login() {
         logger.info("Accediendo a la página de login");
-        return "login";  // Muestra la página de login
+        return "login";
     }
 
     @PostMapping("/login")

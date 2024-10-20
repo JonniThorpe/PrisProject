@@ -10,12 +10,12 @@ public class UsuarioValoraTarea {
 
     @MapsId("usuarioIdusuario")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_idUsuario", nullable = false)
+    @JoinColumn(name = "usuario_id_usuario", nullable = false)
     private Usuario usuarioIdusuario;
 
     @MapsId("tareaIdtarea")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Tarea_idTarea", nullable = false)
+    @JoinColumn(name = "tarea_id_tarea", nullable = false)
     private Tarea tareaIdtarea;
 
     @Column(name = "Valoracion")

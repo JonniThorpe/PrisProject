@@ -10,15 +10,15 @@ public class ProyectoHasUsuario {
 
     @MapsId("proyectoIdproyecto")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
+    @JoinColumn(name = "proyecto_id_proyecto", nullable = false)
     private Proyecto proyectoIdproyecto;
 
     @MapsId("usuarioIdusuario")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_idUsuario", nullable = false)
+    @JoinColumn(name = "usuario_id_usuario", nullable = false)
     private Usuario usuarioIdusuario;
 
-    @Column(name = "PesoCliente")
+    @Column(name = "peso_cliente")
     private Integer pesoCliente;
 
     public ProyectoHasUsuarioId getId() {

@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name = "tarea")
 public class Tarea {
     @Id
-    @Column(name = "idTarea", nullable = false)
+    @Column(name = "id_tarea", nullable = false)
     private Integer id;
 
     @Column(name = "Nombre", length = 45)
@@ -25,7 +25,7 @@ public class Tarea {
     private Integer esfuerzo;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Proyecto_idProyecto", nullable = false)
+    @JoinColumn(name = "proyecto_id_proyecto", nullable = false)
     private Proyecto proyectoIdproyecto;
 
     @OneToMany(mappedBy = "tareaIdtarea")
