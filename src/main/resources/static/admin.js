@@ -1,5 +1,8 @@
+// Variable global para almacenar el ID del proyecto seleccionado
+let selectedProjectId = null;
+
 // Función para mostrar los detalles del proyecto
-function showProjectDetails(projectName) {
+function showProjectDetails(projectName, projectId) {
     // Mostrar la sección de detalles del proyecto
     var projectDetailsSection = document.getElementById('projectDetails');
     projectDetailsSection.classList.remove('hidden');
@@ -7,6 +10,9 @@ function showProjectDetails(projectName) {
     // Asignar el nombre del proyecto al título
     var projectTitle = document.getElementById('projectTitle');
     projectTitle.textContent = projectName;
+
+    // Guardar el ID del proyecto seleccionado
+    selectedProjectId = projectId;
 }
 
 // Función para ocultar la sección de detalles del proyecto
@@ -22,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
     projectItems.forEach(function (item) {
         item.addEventListener('click', function () {
             var projectName = item.textContent;
-            showProjectDetails(projectName);
+            var projectId = item.getAttribute('data-project-id'); // Obtener el ID del proyecto desde el atributo data
+            showProjectDetails(projectName, projectId);
         });
     });
 });
@@ -43,6 +50,13 @@ document.getElementById('addTaskBtn').addEventListener('click', function () {
 document.getElementById('addBudgetBtn').addEventListener('click', function () {
     var budgetForm = document.getElementById('budgetForm');
     budgetForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+
+    // Si hay un proyecto seleccionado, actualizar el campo hidden con el ID del proyecto
+    if (selectedProjectId !== null) {
+        document.getElementById('selectedProjectId').value = selectedProjectId;
+    } else {
+        alert('Selecciona un proyecto antes de añadir un presupuesto');
+    }
 });
 
 // Ver lista de tareas (Esta función es un esqueleto que se puede expandir)

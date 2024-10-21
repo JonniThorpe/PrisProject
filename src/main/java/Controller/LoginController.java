@@ -47,6 +47,6 @@ public class LoginController {
     public String logout(HttpSession session) {
         logger.info("Cerrando sesión");
         session.invalidate();
-        return "redirect:/login";
+        return "index";
     }
 }

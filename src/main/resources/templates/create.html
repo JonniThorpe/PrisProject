@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Proyecto</title>
-    <link th:href="@{/index.css}" rel="stylesheet">
+    <link th:href="@{/create.css}" rel="stylesheet">
 </head>
 <body>
 <header>
+    <!-- Enlace con el SVG para regresar a /admin -->
+    <a th:href="@{/admin}" class="back-button">
+        <img th:src="@{/images/flecha.svg}" alt="Back" class="back-svg">
+    </a>
     <h1>Crear un nuevo proyecto</h1>
 </header>
 
 <main>
     <section>
-        <h2>Formulario para crear proyecto</h2>
+        <h2>Nuevo Proyecto</h2>
         <form th:action="@{/create}" method="post">
             <label for="nombre">Nombre del proyecto:</label>
             <input type="text" id="nombre" name="nombre" required>

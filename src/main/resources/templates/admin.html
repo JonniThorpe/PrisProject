@@ -4,40 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrador</title>
-    <link th:href="@{/index.css}" rel="stylesheet">
+    <link th:href="@{/admin.css}" rel="stylesheet">
     <link rel="stylesheet" href="/src/main/resources/static/index.css">
 </head>
 <body>
 <header>
-    <h1>Panel Administrador</h1>
-
-    <a class='login-button' th:href="@{/login}">Iniciar Sesión</a>
+    <!-- SVG Logo en lugar del texto "Plataforma de Gestión de Proyectos" -->
+    <div class="logo-container">
+        <img th:src="@{/images/logo.svg}" alt="Logo" class="logo">
+    </div>
+    <a class="login-button" th:href="@{/logout}">Cerrar Sesión</a>
 </header>
 
 <p class='hey' th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'">¡Hola! ¿Qué tal estás?</p>
 
-
 <main class="admin-panel">
-    <section class="create-project">
-        <h2>Crear un nuevo proyecto</h2>
-        <a th:href="@{/create}"><button id="createProjectBtn">Crear Proyecto</button></a>
-    </section>
+    <div class="flex-container">
+        <section class="create-project">
+            <h2>Crear un nuevo proyecto</h2>
+            <a th:href="@{/create}"><button id="createProjectBtn">Crear Proyecto</button></a>
+        </section>
 
-    <section class="project-list">
-        <h2>Proyectos disponibles</h2>
-        <ul>
-            <!-- Itera sobre la lista de proyectos y genera cada proyecto como un item en la lista -->
-            <li class="project-item" th:each="proyecto : ${proyectos}"
-                th:data-project-name="${proyecto.nombre}"
-                th:text="${proyecto.nombre}"></li>
-        </ul>
-    </section>
-
-
+        <section class="project-list">
+            <h2>Proyectos</h2>
+            <ul>
+                <!-- Itera sobre los proyectos disponibles -->
+                <li th:each="proyecto : ${proyectos}"
+                    th:data-project-id="${proyecto.id}"
+                    th:text="${proyecto.nombre}"
+                    class="project-item">
+                    <!-- El nombre del proyecto se muestra y el ID se guarda en data-project-id -->
+                </li>
+            </ul>
+        </section>
+    </div>
 </main>
 
 <section id="projectDetails" class="project-details hidden">
-    <h2>Vista del Proyecto: <span id="projectTitle">Nombre del proyecto</span></h2>
+    <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
 
     <button id="addClientBtn">Añadir Cliente</button>
     <button id="addTaskBtn">Añadir Tarea</button>
@@ -67,14 +71,15 @@
         </form>
     </div>
 
-    <div id="budgetForm" class="hidden">
-        <h3>Añadir Presupuesto</h3>
-        <form>
-            <label for="projectBudget">Presupuesto:</label>
-            <input type="number" id="projectBudget">
-            <button type="submit">Ajustar Presupuesto</button>
-        </form>
-    </div>
+    <form th:action="@{/admin/updateBudget}" method="post" id="budgetForm" class="hidden">
+        <label for="projectBudget">Nuevo Presupuesto:</label>
+        <input type="number" name="pesoMaximoTareas" id="projectBudget" required>
+
+        <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
+        <input type="hidden" name="idProyecto" id="selectedProjectId" th:value="${selectedProjectId}">
+
+        <button type="submit">Actualizar Presupuesto</button>
+    </form>
 
     <div id="taskList" class="hidden">
         <h3>Tareas y Clientes</h3>
@@ -102,11 +107,9 @@
             <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
         </ul>
     </div>
-
 </section>
 
 <script th:src="@{/admin.js}"></script>
 <script src="/src/main/resources/static/admin.js"></script>
-
 </body>
 </html>
