@@ -38,76 +38,77 @@
             </ul>
         </section>
     </div>
-</main>
+    <section id="projectDetails" class="project-details hidden">
+        <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
 
-<section id="projectDetails" class="project-details hidden">
-    <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
+        <button id="addClientBtn">Añadir Cliente</button>
+        <button id="addTaskBtn">Añadir Tarea</button>
+        <button id="addBudgetBtn">Añadir Presupuesto</button>
 
-    <button id="addClientBtn">Añadir Cliente</button>
-    <button id="addTaskBtn">Añadir Tarea</button>
-    <button id="addBudgetBtn">Añadir Presupuesto</button>
+        <button id="viewTasksBtn">Ver Tareas</button>
+        <button id="viewRatingsBtn">Ver Valoraciones</button>
+        <button id="viewResultBtn">Ver Cálculo del Resultado</button>
 
-    <button id="viewTasksBtn">Ver Tareas</button>
-    <button id="viewRatingsBtn">Ver Valoraciones</button>
-    <button id="viewResultBtn">Ver Cálculo del Resultado</button>
+        <div id="clientList" class="hidden">
+            <h3>Seleccionar Cliente</h3>
+            <ul>
+                <li>Cliente 1</li>
+                <li>Cliente 2</li>
+                <li>Cliente 3</li>
+            </ul>
+        </div>
 
-    <div id="clientList" class="hidden">
-        <h3>Seleccionar Cliente</h3>
-        <ul>
-            <li>Cliente 1</li>
-            <li>Cliente 2</li>
-            <li>Cliente 3</li>
-        </ul>
-    </div>
+        <div id="taskForm" class="hidden">
+            <h3>Añadir Tarea</h3>
+            <form>
+                <label for="taskName">Nombre de la tarea:</label>
+                <input type="text" id="taskName">
+                <label for="taskEffort">Esfuerzo:</label>
+                <input type="number" id="taskEffort">
+                <button type="submit">Añadir Tarea</button>
+            </form>
+        </div>
 
-    <div id="taskForm" class="hidden">
-        <h3>Añadir Tarea</h3>
-        <form>
-            <label for="taskName">Nombre de la tarea:</label>
-            <input type="text" id="taskName">
-            <label for="taskEffort">Esfuerzo:</label>
-            <input type="number" id="taskEffort">
-            <button type="submit">Añadir Tarea</button>
+        <form th:action="@{/admin/updateBudget}" method="post" id="budgetForm" class="hidden">
+            <label for="projectBudget">Nuevo Presupuesto:</label>
+            <input type="number" name="pesoMaximoTareas" id="projectBudget" required>
+
+            <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
+            <input type="hidden" name="idProyecto" id="selectedProjectId" th:value="${selectedProjectId}">
+
+            <button type="submit">Actualizar Presupuesto</button>
         </form>
-    </div>
 
-    <form th:action="@{/admin/updateBudget}" method="post" id="budgetForm" class="hidden">
-        <label for="projectBudget">Nuevo Presupuesto:</label>
-        <input type="number" name="pesoMaximoTareas" id="projectBudget" required>
+        <div id="taskList" class="hidden">
+            <h3>Tareas y Clientes</h3>
+            <ul>
+                <li>Tarea 1 - Cliente 1</li>
+                <li>Tarea 2 - Cliente 2</li>
+                <li>Tarea 3 - Cliente 3</li>
+            </ul>
+        </div>
 
-        <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
-        <input type="hidden" name="idProyecto" id="selectedProjectId" th:value="${selectedProjectId}">
+        <div id="ratingList" class="hidden">
+            <h3>Valoraciones de Clientes</h3>
+            <ul>
+                <li>Cliente 1 - No ha valorado</li>
+                <li>Cliente 2 - Ha valorado</li>
+                <li>Cliente 3 - No ha valorado</li>
+            </ul>
+        </div>
 
-        <button type="submit">Actualizar Presupuesto</button>
-    </form>
 
-    <div id="taskList" class="hidden">
-        <h3>Tareas y Clientes</h3>
-        <ul>
-            <li>Tarea 1 - Cliente 1</li>
-            <li>Tarea 2 - Cliente 2</li>
-            <li>Tarea 3 - Cliente 3</li>
-        </ul>
-    </div>
 
-    <div id="ratingList" class="hidden">
-        <h3>Valoraciones de Clientes</h3>
-        <ul>
-            <li>Cliente 1 - No ha valorado</li>
-            <li>Cliente 2 - Ha valorado</li>
-            <li>Cliente 3 - No ha valorado</li>
-        </ul>
-    </div>
-
-    <div id="resultCalculation" class="hidden">
-        <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
-        <ul>
-            <li>Tarea 1 - 70% Importancia - Valoración Cliente: 4/5</li>
-            <li>Tarea 2 - 50% Importancia - Valoración Cliente: 3/5</li>
-            <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
-        </ul>
-    </div>
-</section>
+        <div id="resultCalculation" class="hidden">
+            <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
+            <ul>
+                <li>Tarea 1 - 70% Importancia - Valoración Cliente: 4/5</li>
+                <li>Tarea 2 - 50% Importancia - Valoración Cliente: 3/5</li>
+                <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
+            </ul>
+        </div>
+    </section>
+</main>
 
 <script th:src="@{/admin.js}"></script>
 <script src="/src/main/resources/static/admin.js"></script>
