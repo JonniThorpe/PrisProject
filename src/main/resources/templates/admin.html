@@ -16,12 +16,13 @@
     <a class="login-button" th:href="@{/logout}">Cerrar Sesión</a>
 </header>
 
-<p class='hey' th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'">¡Hola! ¿Qué tal estás?</p>
+<!--<p class='hey' th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'">¡Hola! ¿Qué tal estás?</p>-->
 
 <main class="admin-panel">
     <div class="flex-container">
         <section class="create-project">
-            <h2>Crear un nuevo proyecto</h2>
+            <h3 th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'"></h3>
+            <!--<h2>Crear un nuevo proyecto</h2>-->
             <a th:href="@{/create}"><button id="createProjectBtn">Crear Proyecto</button></a>
         </section>
 
