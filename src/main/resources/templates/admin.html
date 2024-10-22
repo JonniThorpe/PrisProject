@@ -59,35 +59,42 @@
             </ul>
         </div>
 
-        <div id="taskForm" class="hidden">
-            <h3>Añadir Tarea</h3>
-            <form>
-                <label for="taskName">Nombre de la tarea:</label>
-                <input type="text" id="taskName">
-                <label for="taskEffort">Esfuerzo:</label>
-                <input type="number" id="taskEffort">
-                <button type="submit">Añadir Tarea</button>
-            </form>
-        </div>
+        <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
+            <label for="taskName">Nombre de la Tarea:</label>
+
+            <input type="text" name="nombre" id="taskName">
+
+            <label for="taskEffort">Esfuerzo:</label>
+
+            <input type="number" name="esfuerzo" id="taskEffort">
+
+            <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
+            <input type="hidden" name="proyectoIdproyecto" id="selectedProjectIdTask" th:value="${selectedProjectId}">
+
+            <button type="submit">Añadir Tarea</button>
+        </form>
 
         <form th:action="@{/admin/updateBudget}" method="post" id="budgetForm" class="hidden">
             <label for="projectBudget">Nuevo Presupuesto:</label>
             <input type="number" name="pesoMaximoTareas" id="projectBudget" required>
 
             <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
-            <input type="hidden" name="idProyecto" id="selectedProjectId" th:value="${selectedProjectId}">
+            <input type="hidden" name="idProyecto" id="selectedProjectIdBudget" th:value="${selectedProjectId}">
 
             <button type="submit">Actualizar Presupuesto</button>
         </form>
 
         <div id="taskList" class="hidden">
-            <h3>Tareas y Clientes</h3>
+            <h3>Tareas</h3>
             <ul>
-                <li>Tarea 1 - Cliente 1</li>
-                <li>Tarea 2 - Cliente 2</li>
-                <li>Tarea 3 - Cliente 3</li>
+                <!-- Itera sobre las tareas del proyecto seleccionado -->
+                <li th:each="tarea : ${proyectoSeleccionado.tareas}"
+                    th:text="${tarea.nombre}">
+                    <!-- El nombre de la tarea se mostrará aquí -->
+                </li>
             </ul>
         </div>
+
 
         <div id="ratingList" class="hidden">
             <h3>Valoraciones de Clientes</h3>

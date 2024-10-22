@@ -1,13 +1,14 @@
 package repository;
 
 import entidades.Tarea;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface TareaRepository extends CrudRepository<Tarea, Integer> {
+/**public interface TareaRepository extends CrudRepository<Tarea, Integer> {
     @Query("SELECT t.id, t.nombre AS nombreTarea, "
             + "SUM(uvt.valoracion * pu.pesoCliente) AS sumatoriaValoracionesPonderadas "
             + "FROM Proyecto p "
@@ -23,4 +24,9 @@ public interface TareaRepository extends CrudRepository<Tarea, Integer> {
             @Param("idProyecto") Long idProyecto,
             @Param("rolCliente") String rolCliente
     );
+}**/
+
+public interface TareaRepository extends JpaRepository<Tarea, Integer> {
+    List<Tarea> findByNombre(String nombre);
 }
+
