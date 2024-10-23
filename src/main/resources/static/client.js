@@ -13,6 +13,10 @@ function showProjectDetails(projectName, projectId) {
 
     // Guardar el ID del proyecto seleccionado
     selectedProjectId = projectId;
+
+    // Cargar las tareas del proyecto seleccionado en el formulario de valoración
+    loadTasksForProject(projectId);
+    showTasksForProject(projectId);
 }
 
 // Añadir evento de clic a cada elemento de la lista de proyectos
@@ -30,20 +34,66 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Función para ocultar la sección de detalles del proyecto
-function hideProjectDetails() {
-    var projectDetailsSection = document.getElementById('projectDetails');
-    projectDetailsSection.classList.add('hidden');
+// Función para cargar las tareas del proyecto seleccionado en el desplegable
+function loadTasksForProject(projectId) {
+    const taskSelect = document.getElementById('taskSelect');
+
+    // Seleccionar todas las opciones de tareas en el HTML
+    const allTasks = document.querySelectorAll('#taskSelect option[data-project-id]');
+
+    // Filtrar y mostrar solo las tareas que coinciden con el proyecto seleccionado
+    allTasks.forEach(task => {
+        if (task.getAttribute('data-project-id') === projectId) {
+            taskSelect.appendChild(task); // Añadir al desplegable
+        }
+    });
 }
 
-// Mostrar/Ocultar la lista de valoraciones (ejemplo de cómo se pueden mostrar otras secciones)
-document.getElementById('viewRatingsBtn').addEventListener('click', function () {
-    var ratingList = document.getElementById('ratingList');
-    ratingList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+// Función para mostrar las tareas del proyecto seleccionado en la lista
+function showTasksForProject(projectId) {
+    const taskList = document.getElementById('taskList');
+    const allTasks = document.querySelectorAll('#taskList li');
+
+    // Ocultar todas las tareas primero
+    allTasks.forEach(task => {
+        task.classList.add('hidden');
+    });
+
+    // Mostrar solo las tareas que coinciden con el proyecto seleccionado
+    allTasks.forEach(task => {
+        if (task.getAttribute('data-project-id') === projectId) {
+            task.classList.remove('hidden'); // Mostrar la tarea
+        }
+    });
+}
+
+// Mostrar el formulario para valorar tareas
+document.getElementById('addRatingBtn').addEventListener('click', function () {
+    var ratingForm = document.getElementById('ratingForm');
+    ratingForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+
+    // Si no hay proyecto seleccionado, mostrar una alerta
+    if (selectedProjectId === null) {
+        alert('Selecciona un proyecto antes de valorar una tarea');
+    }
 });
 
-// Mostrar/Ocultar el cálculo de resultados
-document.getElementById('viewResultBtn').addEventListener('click', function () {
-    var resultCalculation = document.getElementById('resultCalculation');
-    resultCalculation.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+// Función para manejar la selección de la valoración
+document.querySelectorAll('.rating-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        // Quitar la clase activa de otros botones
+        document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+
+        // Añadir la clase activa al botón seleccionado
+        this.classList.add('active');
+
+        // Guardar el valor seleccionado en el input hidden
+        document.getElementById('valoracionInput').value = this.getAttribute('data-value');
+    });
+});
+
+// Mostrar la lista de tareas
+document.getElementById('viewTasksBtn').addEventListener('click', function () {
+    var taskList = document.getElementById('taskList');
+    taskList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
 });

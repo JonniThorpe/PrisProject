@@ -13,4 +13,5 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
     // Encuentra los proyectos por el usuario relacionado
     List<Proyecto> findByUsuarioIdusuario(Usuario usuario);
 
+
 }

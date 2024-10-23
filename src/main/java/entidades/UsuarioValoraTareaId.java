@@ -10,11 +10,22 @@ import java.util.Objects;
 @Embeddable
 public class UsuarioValoraTareaId implements Serializable {
     private static final long serialVersionUID = -7415806676786053496L;
+
     @Column(name = "usuario_id_usuario", nullable = false)
     private Integer usuarioIdusuario;
 
     @Column(name = "tarea_id_tarea", nullable = false)
     private Integer tareaIdtarea;
+
+    // Constructor por defecto
+    public UsuarioValoraTareaId() {
+    }
+
+    // Constructor con parámetros
+    public UsuarioValoraTareaId(Integer usuarioIdusuario, Integer tareaIdtarea) {
+        this.usuarioIdusuario = usuarioIdusuario;
+        this.tareaIdtarea = tareaIdtarea;
+    }
 
     public Integer getUsuarioIdusuario() {
         return usuarioIdusuario;
@@ -45,5 +56,4 @@ public class UsuarioValoraTareaId implements Serializable {
     public int hashCode() {
         return Objects.hash(usuarioIdusuario, tareaIdtarea);
     }
-
 }

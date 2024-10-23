@@ -31,18 +31,39 @@
             </ul>
         </section>
 
-        <!-- Detalles del proyecto -->
+        <!-- Sección de Ver Tareas -->
         <section id="projectDetails" class="project-details hidden">
             <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
 
-            <button id="addClientBtn">Añadir Cliente</button>
-            <button id="addTaskBtn">Añadir Tarea</button>
-            <button id="addBudgetBtn">Añadir Presupuesto</button>
+            <!-- Botón para mostrar el formulario de valoración -->
+            <button id="addRatingBtn">Valorar Tareas</button>
 
+            <!-- Botón para mostrar las tareas del proyecto -->
             <button id="viewTasksBtn">Ver Tareas</button>
-            <button id="viewRatingsBtn">Ver Valoraciones</button>
-            <button id="viewResultBtn">Ver Cálculo del Resultado</button>
+
+            <!-- Formulario para valorar tareas -->
+            <form th:action="@{/client/addRating}" method="post" id="ratingForm" class="hidden">
+                <h3>Valorar Tareas</h3>
+                <label>Selecciona una Tarea:</label>
+                <select name="tareaId" id="taskSelect" required>
+                    <option value="" selected>Tareas</option>
+                    <option th:each="tarea : ${tareas}" th:value="${tarea.id}" th:data-project-id="${tarea.proyectoIdproyecto.id}" th:text="${tarea.nombre}"></option>
+                </select>
+
+                <label>Valoración:</label>
+                <input type="text" name="valoracion" id="valoracionInput" placeholder="Introduce un valor del 0 al 5">
+
+                <button type="submit">Enviar Valoración</button>
+            </form>
+
+            <div id="taskList" class="hidden">
+                <h3>Tareas</h3>
+                <ul id="taskItems">
+                    <li th:each="tarea : ${tareas}" th:data-project-id="${tarea.proyectoIdproyecto.id}" th:text="${tarea.nombre}"></li>
+                </ul>
+            </div>
         </section>
+
     </div>
 </main>
 

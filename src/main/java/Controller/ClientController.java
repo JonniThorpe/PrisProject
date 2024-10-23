@@ -1,16 +1,15 @@
 package Controller;
 
-import entidades.Proyecto;
-import entidades.ProyectoHasUsuario;
-import entidades.Usuario;
+import entidades.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import repository.ProyectoHasUsuarioRepository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import repository.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -19,23 +18,19 @@ public class ClientController {
     @Autowired
     private ProyectoHasUsuarioRepository proyectoHasUsuarioRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private UsuarioValoraTareaRepository usuarioValoraTareaRepository;
+
+    @Autowired
+    private TareaRepository tareaRepository;
+
     @GetMapping("/client")
     public String mostrarPanelClient(HttpSession session, Model model) {
-        // Obtener el rol del usuario desde la sesión
-        String rolUsuario = (String) session.getAttribute("rol");
-
-        // Si el rol no es 'Client', redirigir a una página de error o prohibir acceso
-        if (rolUsuario == null) {
-            return "redirect:/login"; // O redirige a una página de error o login
-        } else if (rolUsuario.equals("Admin")) {
-            return "redirect:/admin"; // Redirige a la vista de admin
-
-        }
-
         // Obtener el idUsuario y nombreUsuario de la sesión
         Integer idUsuario = (Integer) session.getAttribute("idUsuario");
-        String nombreUsuario = (String) session.getAttribute("nombreUsuario");
-
         if (idUsuario == null) {
             return "redirect:/login";  // Si no hay usuario en sesión, redirige al login
         }
@@ -44,14 +39,60 @@ public class ClientController {
         Usuario usuario = new Usuario();
         usuario.setId(idUsuario);
 
-        // Consultar los proyectos asociados al usuario a través de la tabla intermedia
+        // Consultar los proyectos asociados al usuario
         List<ProyectoHasUsuario> proyectosDeUsuario = proyectoHasUsuarioRepository.findByUsuarioIdusuario(usuario);
 
-        // Añadir los proyectos y datos del usuario al modelo para mostrar en la página
+        // Cargar las tareas asociadas a cada proyecto
+        List<Tarea> tareas = tareaRepository.findAll(); // Aquí puedes filtrar las tareas si lo necesitas
+
+        // Añadir los proyectos, tareas y datos del usuario al modelo
         model.addAttribute("proyectosDeUsuario", proyectosDeUsuario);
-        model.addAttribute("nombreUsuario", nombreUsuario);
+        model.addAttribute("tareas", tareas);
+        model.addAttribute("nombreUsuario", (String) session.getAttribute("nombreUsuario"));
 
-        return "client";  // Retorna la vista client.html
+        return "client";
     }
+    
+    @PostMapping("/client/addRating")
+    public String addRating(@RequestParam("tareaId") Integer tareaId,
+                            @RequestParam("valoracion") Integer valoracion,
+                            HttpSession session, Model model) {
 
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+
+        if (idUsuario == null) {
+            return "redirect:/login";
+        }
+
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            model.addAttribute("mensaje", "Usuario no encontrado.");
+            return "client";
+        }
+
+        Tarea tarea = tareaRepository.findById(tareaId).orElse(null);
+        if (tarea == null) {
+            model.addAttribute("mensaje", "Tarea no encontrada.");
+            return "client";
+        }
+
+        UsuarioValoraTareaId valoracionId = new UsuarioValoraTareaId(idUsuario, tareaId);
+        UsuarioValoraTarea valoracionTarea = usuarioValoraTareaRepository.findById(valoracionId).orElse(null);
+
+        if (valoracionTarea == null) {
+            valoracionTarea = new UsuarioValoraTarea();
+            valoracionTarea.setId(valoracionId);
+            valoracionTarea.setUsuarioIdusuario(usuario);
+            valoracionTarea.setTareaIdtarea(tarea);
+        }
+
+        valoracionTarea.setValoracion(valoracion);
+        valoracionTarea.setValorada((byte) 1);
+
+        usuarioValoraTareaRepository.save(valoracionTarea);
+
+        model.addAttribute("mensaje", "Valoración añadida con éxito.");
+
+        return "redirect:/client";
+    }
 }
