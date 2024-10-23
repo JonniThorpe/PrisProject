@@ -1,0 +1,262 @@
+:root {
+    --color-primary: #cdbfa3;
+    --color-danger: #FF0060;
+    --color-success: #1B9C85;
+    --color-warning: #F7D060;
+    --color-white: #fff;
+    --color-info-dark: #7d8da1;
+    --color-dark: #363949;
+    --color-light: rgba(243, 221, 170, 0.18);
+    --color-dark-variant: #677483;
+    --color-background: #f6f6f9;
+
+    --border-radius-1: 0.4rem;
+    --card-padding: 1.8rem;
+    --padding-1: 1.2rem;
+
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+.dark-mode-variables {
+    --color-background: #181a1e;
+    --color-white: #202528;
+    --color-dark: #edeffd;
+    --color-dark-variant: #a3bdcc;
+    --color-light: rgba(0, 0, 0, 0.4);
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    border: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-size: 0.88rem;
+    user-select: none;
+    overflow-x: hidden;
+    color: var(--color-dark);
+    background-color: var(--color-background);
+}
+
+header {
+    width: 100%;
+    padding: 20px;
+    background-color: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 50px; /* Ajusta el tamaño del logo */
+    width: auto;
+}
+
+.login-button {
+    background-color: transparent;
+    color: var(--color-dark);
+    font-size: 1.1rem;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none; /* Elimina el subrayado predeterminado del enlace */
+    padding: 0px 10px 5px;
+    transition: color 0.3s ease;
+}
+
+.login-button::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-dark); /* Color de la línea */
+    transition: width 0.4s ease; /* Transición suave */
+}
+
+.login-button:hover::before {
+    width: 100%; /* La línea se expande al 100% en hover */
+}
+
+.login-button:hover {
+    color: var(--color-dark); /* Asegura que el color del texto no cambie */
+}
+
+.hey {
+    font-size: 1.3rem;
+    font-weight: normal;
+    padding: 10px 20px;
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centra todos los contenedores */
+    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    padding: 20px;
+    gap: 20px; /* Espacio entre secciones */
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+section {
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1 1 45%;
+    max-width: 45%;
+    min-width: 300px; /* Para evitar que se hagan demasiado pequeños */
+}
+
+section:hover {
+    box-shadow: none;
+}
+
+.project-details {
+    width: 100%; /* Asegura que el proyecto ocupe todo el ancho disponible */
+}
+
+button {
+    background-color: transparent;
+    color: var(--color-primary);
+    padding: 10px 0;
+    font-size: 1rem;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+    border-bottom: 2px solid var(--color-primary); /* Añade borde solo en la parte inferior */
+    border-radius: 0; /* Sin borde redondeado */
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary); /* Color de la línea */
+    transition: width 0.4s ease;
+}
+
+button:hover::before {
+    width: 100%; /* La línea se expande al 100% en hover */
+}
+
+button:hover {
+    color: var(--color-dark); /* Cambia el color del texto en hover */
+}
+
+h2, h3 {
+    margin-bottom: 15px;
+    color: var(--color-dark);
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: var(--color-background);
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: var(--border-radius-1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+ul li:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.hidden {
+    display: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+form input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius-1);
+}
+
+.project-details button {
+    margin-right: 10px;
+}
+
+.project-details ul {
+    padding: 0;
+    list-style: none;
+}
+
+.project-details li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#projectTitle {
+    color: var(--color-black);
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    ul li {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    h2, h3 {
+        font-size: 1.2rem;
+    }
+
+    form input {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+}

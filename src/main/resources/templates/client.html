@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Cliente</title>
+    <link th:href="@{/client.css}" rel="stylesheet">
+    <link rel="stylesheet" href="/src/main/resources/static/index.css">
+</head>
+<body>
+<header>
+    <div class="logo-container">
+        <img th:src="@{/images/logo.svg}" alt="Logo" class="logo">
+    </div>
+    <a class="login-button" th:href="@{/logout}">Cerrar Sesión</a>
+</header>
+
+<main class="admin-panel">
+    <div class="flex-container">
+        <section class="project-list">
+            <h3 th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para ver tus proyectos?'"></h3>
+
+            <h2>Proyectos</h2>
+            <ul>
+                <li th:each="phu : ${proyectosDeUsuario}"
+                    th:data-project-id="${phu.proyectoIdproyecto.id}"
+                    th:text="${phu.proyectoIdproyecto.nombre}"
+                    class="project-item">
+                    <!-- Nombre del proyecto mostrado y el ID del proyecto guardado en el atributo data -->
+                </li>
+            </ul>
+        </section>
+
+        <!-- Detalles del proyecto -->
+        <section id="projectDetails" class="project-details hidden">
+            <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
+
+            <button id="addClientBtn">Añadir Cliente</button>
+            <button id="addTaskBtn">Añadir Tarea</button>
+            <button id="addBudgetBtn">Añadir Presupuesto</button>
+
+            <button id="viewTasksBtn">Ver Tareas</button>
+            <button id="viewRatingsBtn">Ver Valoraciones</button>
+            <button id="viewResultBtn">Ver Cálculo del Resultado</button>
+        </section>
+    </div>
+</main>
+
+<script th:src="@{/client.js}"></script>
+<script src="/src/main/resources/static/admin.js"></script>
+</body>
+</html>

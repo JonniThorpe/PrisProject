@@ -10,6 +10,7 @@ import java.util.Set;
 public class Usuario {
     @Id
     @Column(name = "id_usuario", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "Nombre", length = 45)

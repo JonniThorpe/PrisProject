@@ -3,47 +3,53 @@ let selectedProjectId = null;
 
 // Función para mostrar los detalles del proyecto
 function showProjectDetails(projectName, projectId) {
-    // Mostrar la sección de detalles del proyecto
     var projectDetailsSection = document.getElementById('projectDetails');
     projectDetailsSection.classList.remove('hidden');
 
-    // Asignar el nombre del proyecto al título
     var projectTitle = document.getElementById('projectTitle');
     projectTitle.textContent = projectName;
 
-    // Guardar el ID del proyecto seleccionado
     selectedProjectId = projectId;
 
-    // Cargar las tareas del proyecto seleccionado
-    loadTasksForProject(projectId);
+    // Mostrar solo las tareas del proyecto seleccionado
+    showProjectTasks(projectId);
 }
 
-// Función para cargar las tareas de un proyecto mediante AJAX
-function loadTasksForProject(projectId) {
-    // Realizar una petición para obtener las tareas del proyecto seleccionado
-    fetch(`/admin/tasks?projectId=${projectId}`)
-        .then(response => response.json())
-        .then(data => {
-            // Limpiar la lista de tareas anterior
-            var taskItems = document.getElementById('taskItems');
-            taskItems.innerHTML = '';
+// Función para mostrar solo las tareas correspondientes al proyecto seleccionado
+function showProjectTasks(projectId) {
+    var taskItems = document.querySelectorAll('#taskItems li');  // Selecciona todos los elementos de tarea
 
-            // Si no hay tareas, mostrar un mensaje
-            if (data.length === 0) {
-                taskItems.innerHTML = '<li>No hay tareas para este proyecto.</li>';
-            } else {
-                // Recorrer las tareas y añadirlas a la lista
-                data.forEach(task => {
-                    var li = document.createElement('li');
-                    li.textContent = task.nombre; // Nombre de la tarea
-                    taskItems.appendChild(li);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error al cargar las tareas:', error);
+    taskItems.forEach(function (taskItem) {
+        var taskProjectId = taskItem.getAttribute('data-project-id');
+        if (taskProjectId === projectId.toString()) {
+            taskItem.style.display = '';  // Mostrar tarea
+        } else {
+            taskItem.style.display = 'none';  // Ocultar tarea
+        }
+    });
+}
+
+// Añadir evento de clic a cada elemento de la lista de proyectos
+document.addEventListener("DOMContentLoaded", function () {
+    var projectItems = document.querySelectorAll('.project-item');
+
+    projectItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+            var projectName = item.textContent;
+            var projectId = item.getAttribute('data-project-id');
+            showProjectDetails(projectName, projectId);  // Mostrar los detalles del proyecto
         });
-}
+    });
+
+    // Botón "Ver Tareas"
+    document.getElementById('viewTasksBtn').addEventListener('click', function () {
+        if (selectedProjectId !== null) {
+            showProjectTasks(selectedProjectId);  // Filtrar tareas según el proyecto seleccionado
+        } else {
+            alert('Por favor, selecciona un proyecto primero.');
+        }
+    });
+});
 
 // Función para ocultar la sección de detalles del proyecto
 function hideProjectDetails() {
@@ -64,10 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Mostrar/Añadir clientes (Esta función es un esqueleto que se puede expandir)
+// Mostrar/Añadir tareas
 document.getElementById('addClientBtn').addEventListener('click', function () {
-    var clientList = document.getElementById('clientList');
-    clientList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+    var taskForm = document.getElementById('clientForm');
+    taskForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
 });
 
 // Mostrar/Añadir tareas
@@ -120,12 +126,4 @@ document.getElementById('viewResultBtn').addEventListener('click', function () {
 document.addEventListener("DOMContentLoaded", function () {
     var projectItems = document.querySelectorAll('.project-item');
 
-    projectItems.forEach(function (item) {
-        item.addEventListener('click', function () {
-            var projectId = item.getAttribute('data-project-id'); // Obtener el ID del proyecto desde el atributo data
-
-            // Redirigir a la URL que carga los detalles del proyecto
-            window.location.href = `/admin/projectDetails?idProyecto=${projectId}`;
-        });
-    });
 });

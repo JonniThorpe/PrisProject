@@ -9,7 +9,7 @@ public class ProyectoHasUsuario {
     private ProyectoHasUsuarioId id;
 
     @MapsId("proyectoIdproyecto")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)  // Cambiado a EAGER
     @JoinColumn(name = "proyecto_id_proyecto", nullable = false)
     private Proyecto proyectoIdproyecto;
 
@@ -21,6 +21,7 @@ public class ProyectoHasUsuario {
     @Column(name = "peso_cliente")
     private Integer pesoCliente;
 
+    // Getters y Setters
     public ProyectoHasUsuarioId getId() {
         return id;
     }
@@ -52,5 +53,4 @@ public class ProyectoHasUsuario {
     public void setPesoCliente(Integer pesoCliente) {
         this.pesoCliente = pesoCliente;
     }
-
 }

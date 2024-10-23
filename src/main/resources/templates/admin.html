@@ -50,14 +50,16 @@
         <button id="viewRatingsBtn">Ver Valoraciones</button>
         <button id="viewResultBtn">Ver Cálculo del Resultado</button>
 
-        <div id="clientList" class="hidden">
-            <h3>Seleccionar Cliente</h3>
-            <ul>
-                <li>Cliente 1</li>
-                <li>Cliente 2</li>
-                <li>Cliente 3</li>
-            </ul>
-        </div>
+        <form th:action="@{/admin/newClient}" method="post" id="clientForm" class="hidden">
+            <label for="clientName">Nick del Cliente:</label>
+            <input type="text" name="nombre" id="clientName" required>
+
+            <label for="clientPassword">Contraseña del Cliente:</label>
+            <input type="password" name="contraseña" id="clientPassword" required>
+
+            <button type="submit">Añadir Cliente</button>
+        </form>
+
 
         <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
             <label for="taskName">Nombre de la Tarea:</label>
@@ -83,12 +85,13 @@
         </form>
 
         <div id="taskList" class="hidden">
-
             <h3>Tareas</h3>
-            <ul>
-                <li th:each="tarea : ${tareas}" th:text="${tarea.nombre}">Nombre de la Tarea</li>
+            <ul id="taskItems">
+                <li th:each="tarea : ${tareas}" th:data-project-id="${tarea.proyectoIdproyecto.id}" th:text="${tarea.nombre}"></li>
             </ul>
         </div>
+
+
 
         <div id="ratingList" class="hidden">
             <h3>Valoraciones de Clientes</h3>
