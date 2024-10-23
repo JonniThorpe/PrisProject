@@ -70,24 +70,33 @@ document.getElementById('addClientBtn').addEventListener('click', function () {
     clientList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
 });
 
-// Mostrar/Añadir tareas (Esta función es un esqueleto que se puede expandir)
+// Mostrar/Añadir tareas
 document.getElementById('addTaskBtn').addEventListener('click', function () {
     var taskForm = document.getElementById('taskForm');
     taskForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+
+    // Si hay un proyecto seleccionado, actualizar el campo hidden con el ID del proyecto
+    if (selectedProjectId !== null) {
+        document.getElementById('selectedProjectIdTask').value = selectedProjectId;
+    } else {
+        alert('Selecciona un proyecto antes de añadir una tarea');
+    }
 });
 
-// Mostrar/Añadir presupuesto (Esta función es un esqueleto que se puede expandir)
+
+// Mostrar/Añadir presupuesto
 document.getElementById('addBudgetBtn').addEventListener('click', function () {
     var budgetForm = document.getElementById('budgetForm');
     budgetForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
 
     // Si hay un proyecto seleccionado, actualizar el campo hidden con el ID del proyecto
     if (selectedProjectId !== null) {
-        document.getElementById('selectedProjectId').value = selectedProjectId;
+        document.getElementById('selectedProjectIdBudget').value = selectedProjectId;
     } else {
         alert('Selecciona un proyecto antes de añadir un presupuesto');
     }
 });
+
 
 // Ver lista de tareas
 document.getElementById('viewTasksBtn').addEventListener('click', function () {

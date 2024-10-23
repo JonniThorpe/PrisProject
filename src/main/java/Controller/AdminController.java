@@ -107,7 +107,7 @@ public class AdminController {
         }
 
         // Buscar el proyecto al que se añadirá la tarea
-        Optional<Proyecto> proyectoOptional = proyectoRepository.findById(proyectoIdproyecto.longValue());
+        Optional<Proyecto> proyectoOptional = proyectoRepository.findById(Long.valueOf(proyectoIdproyecto));
 
         if (proyectoOptional.isPresent()) {
             Proyecto proyecto = proyectoOptional.get();
@@ -140,33 +140,4 @@ public class AdminController {
 
         return "admin";  // Retorna la vista admin.html actualizada
     }
-    @GetMapping("/admin/projectDetails")
-    public String mostrarDetallesProyecto(@RequestParam("idProyecto") Integer idProyecto, HttpSession session, Model model) {
-        // Obtener el idUsuario de la sesión
-        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
-
-        if (idUsuario == null) {
-            return "redirect:/login";  // Si no hay usuario en sesión, redirige al login
-        }
-
-        // Buscar el proyecto en la base de datos
-        Optional<Proyecto> proyectoOptional = proyectoRepository.findById(Long.valueOf(idProyecto));
-
-        if (proyectoOptional.isPresent()) {
-            Proyecto proyecto = proyectoOptional.get();
-
-            // Asegurarse de que el proyecto pertenece al usuario actual
-            if (proyecto.getUsuarioIdusuario().getId().equals(idUsuario)) {
-                // Añadir el proyecto y las tareas al modelo
-                model.addAttribute("proyectoSeleccionado", proyecto);
-            } else {
-                model.addAttribute("mensaje", "Error: No tienes permiso para ver este proyecto.");
-            }
-        } else {
-            model.addAttribute("mensaje", "Error: Proyecto no encontrado.");
-        }
-
-        return "admin";  // Retorna la vista admin.html actualizada con las tareas del proyecto
-    }
-
 }

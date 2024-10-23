@@ -61,15 +61,13 @@
 
         <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
             <label for="taskName">Nombre de la Tarea:</label>
-
-            <input type="text" name="nombre" id="taskName">
+            <input type="text" name="nombre" id="taskName" required>
 
             <label for="taskEffort">Esfuerzo:</label>
-
-            <input type="number" name="esfuerzo" id="taskEffort">
+            <input type="number" name="esfuerzo" id="taskEffort" required>
 
             <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
-            <input type="hidden" name="proyectoIdproyecto" id="selectedProjectIdTask" th:value="${selectedProjectId}">
+            <input type="hidden" name="proyectoIdproyecto" id="selectedProjectIdTask" th:value="${selectedProjectId}" />
 
             <button type="submit">Añadir Tarea</button>
         </form>
@@ -85,16 +83,12 @@
         </form>
 
         <div id="taskList" class="hidden">
+
             <h3>Tareas</h3>
             <ul>
-                <!-- Itera sobre las tareas del proyecto seleccionado -->
-                <li th:each="tarea : ${proyectoSeleccionado.tareas}"
-                    th:text="${tarea.nombre}">
-                    <!-- El nombre de la tarea se mostrará aquí -->
-                </li>
+                <li th:each="tarea : ${tareas}" th:text="${tarea.nombre}">Nombre de la Tarea</li>
             </ul>
         </div>
-
 
         <div id="ratingList" class="hidden">
             <h3>Valoraciones de Clientes</h3>
