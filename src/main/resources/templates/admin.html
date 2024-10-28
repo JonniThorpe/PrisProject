@@ -88,7 +88,6 @@
             <button type="submit">Actualizar Presupuesto</button>
         </form>
 
-        <!-- Lista de tareas del proyecto -->
         <div id="taskList" class="hidden">
             <h3>Tareas</h3>
             <ul id="taskItems">
@@ -96,15 +95,20 @@
             </ul>
         </div>
 
-        <!-- Lista de valoraciones -->
         <div id="ratingList" class="hidden">
             <h3>Valoraciones de Clientes</h3>
-            <ul>
-                <li>Cliente 1 - No ha valorado</li>
-                <li>Cliente 2 - Ha valorado</li>
-                <li>Cliente 3 - No ha valorado</li>
-            </ul>
+
+            <!-- Agrupar las valoraciones por cliente, y asignar el data-project-id para filtrar por proyecto -->
+            <div th:each="valoracion : ${valoraciones}" th:data-project-id="${valoracion.idProyecto}" class="rating-item">
+                <h4 th:text="'Cliente: ' + ${valoracion.nombreCliente}"></h4>
+                <ul>
+                    <li th:text="'Tarea: ' + ${valoracion.nombreTarea} + ' - Valoración: ' + ${valoracion.valoracion}"></li>
+                </ul>
+            </div>
         </div>
+
+
+
 
         <!-- Cálculo del resultado -->
         <div id="resultCalculation" class="hidden">

@@ -5,36 +5,39 @@ let activeSection = null; // Variable para rastrear la sección o formulario act
 // Función para mostrar u ocultar la sección de detalles del proyecto
 function showProjectDetails(projectName, projectId) {
     const projectDetailsSection = document.getElementById('projectDetails');
-    if (projectDetailsSection.classList.contains('hidden')) {
-        // Oculta la sección de detalles del proyecto
+    if (!projectDetailsSection.classList.contains('hidden') && selectedProjectId === projectId) {
         projectDetailsSection.classList.add('hidden');
+        selectedProjectId = null;
         document.getElementById('projectTitle').textContent = '';
-
-        // Asegura que el campo oculto para projectId tenga el valor correcto
-        document.getElementById('selectedProjectIdAssignClient').value = projectId;
-        document.getElementById('selectedProjectIdTask').value = projectId;
-        document.getElementById('selectedProjectIdBudget').value = projectId;
     } else {
-        // Muestra la sección de detalles del proyecto
         projectDetailsSection.classList.remove('hidden');
         document.getElementById('projectTitle').textContent = projectName;
-
-        // Asigna el ID del proyecto a los formularios relevantes
         document.getElementById('selectedProjectIdAssignClient').value = projectId;
         document.getElementById('selectedProjectIdTask').value = projectId;
         document.getElementById('selectedProjectIdBudget').value = projectId;
-
         selectedProjectId = projectId;
-        showProjectTasks(projectId);
+        showProjectTasks(projectId); // Asegura que se muestran solo las tareas del proyecto seleccionado
     }
 }
 
-// Función para mostrar solo las tareas correspondientes al proyecto seleccionado
 function showProjectTasks(projectId) {
-    const taskItems = document.querySelectorAll('#taskItems li');
-    taskItems.forEach((taskItem) => {
-        const taskProjectId = taskItem.getAttribute('data-project-id');
-        taskItem.style.display = taskProjectId === projectId.toString() ? '' : 'none';
+    var taskItems = document.querySelectorAll('#taskItems li');  // Selecciona todos los elementos de tarea
+    taskItems.forEach(function (taskItem) {
+        var taskProjectId = taskItem.getAttribute('data-project-id');
+        if (taskProjectId === projectId.toString()) {
+            taskItem.style.display = '';  // Mostrar tarea
+        } else {
+            taskItem.style.display = 'none';  // Ocultar tarea
+        }
+    });
+}
+
+// Función para mostrar solo las valoraciones del proyecto seleccionado
+function showProjectRatings(projectId) {
+    const ratingItems = document.querySelectorAll('.rating-item');
+    ratingItems.forEach((ratingItem) => {
+        const ratingProjectId = ratingItem.getAttribute('data-project-id');
+        ratingItem.style.display = ratingProjectId === projectId.toString() ? '' : 'none';
     });
 }
 
@@ -54,7 +57,6 @@ function toggleSection(section) {
 
 // Configuración de eventos y lógica
 document.addEventListener("DOMContentLoaded", function () {
-    // Evento de clic para cada proyecto
     const projectItems = document.querySelectorAll('.project-item');
     projectItems.forEach((item) => {
         item.addEventListener('click', function () {
@@ -67,15 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Botón "Asignar Cliente a Proyecto"
     document.getElementById('assignProjectClientBtn').addEventListener('click', function () {
         const assignClientForm = document.getElementById('assignClientForm');
-        console.log("Botón 'Asignar Cliente a Proyecto' clicado"); // Depuración
         toggleSection(assignClientForm);
 
-        // Asegura que el campo oculto para projectId tenga el valor correcto
         if (selectedProjectId === null) {
             alert('Selecciona un proyecto antes de asignar clientes.');
         } else {
             document.getElementById('selectedProjectIdAssignClient').value = selectedProjectId;
-            console.log("ID del proyecto asignado: ", selectedProjectId); // Depuración
         }
     });
 
@@ -109,7 +108,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ver lista de valoraciones
     document.getElementById('viewRatingsBtn').addEventListener('click', function () {
-        toggleSection(document.getElementById('ratingList'));
+        if (selectedProjectId === null) {
+            alert('Selecciona un proyecto antes de ver las valoraciones.');
+        } else {
+            showProjectRatings(selectedProjectId);
+            toggleSection(document.getElementById('ratingList'));
+        }
     });
 
     // Ver cálculo de resultado

@@ -138,6 +138,14 @@ section:hover {
     box-shadow: none;
 }
 
+section > div {
+    padding-top: 0.7rem;
+}
+
+section > form {
+    padding-top: 0.7rem;
+}
+
 .project-details {
     width: 100%; /* Asegura que el proyecto ocupe todo el ancho disponible */
 }
@@ -240,23 +248,56 @@ form input {
     margin-bottom: 20px;
 }
 
-@media (max-width: 480px) {
-    button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
+@media (max-width: 768px) {
+    /* Ajuste de la estructura y tipografía para pantallas móviles */
+    header, .flex-container, main {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
     }
 
-    ul li {
-        font-size: 0.9rem;
-        padding: 10px;
+    section {
+        flex: 1 1 100%;
+        max-width: 100%;
     }
 
     h2, h3 {
         font-size: 1.2rem;
     }
 
+    button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
     form input {
         padding: 8px;
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes adicionales para pantallas extra pequeñas */
+    h2, h3 {
+        font-size: 1.1rem;
+    }
+
+    ul li {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    button, .login-button {
+        font-size: 0.8rem;
+        padding: 5px;
+    }
+
+    form input {
+        padding: 6px;
+        font-size: 0.8rem;
+    }
+
+    #projectTitle {
+        font-size: 1.1rem;
     }
 }

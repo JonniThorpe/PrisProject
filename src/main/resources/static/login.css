@@ -6,7 +6,7 @@
 html, body {
     height: 100vh;
     width: 100vw;
-    margin: 0 0;
+    margin: 0;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -164,22 +164,22 @@ input:focus {
 @keyframes shake-shake {
     0% {
         transform: translateX(-3px);
-   }
+    }
     20% {
         transform: translateX(3px);
-   }
+    }
     40% {
         transform: translateX(-3px);
-   }
+    }
     60% {
         transform: translateX(3px);
-   }
+    }
     80% {
         transform: translateX(-3px);
-   }
+    }
     100% {
         transform: translateX(0px);
-   }
+    }
 }
 .session {
     display: flex;
@@ -205,4 +205,63 @@ input:focus {
     height: 40px;
     width: auto;
     margin: 20px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .session {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    .left {
+        width: 100%;
+        height: 150px;
+        border-radius: 0;
+        background-position: center;
+        background-size: cover;
+    }
+    form {
+        width: 90%;
+        padding: 20px;
+    }
+    h4 {
+        font-size: 20px;
+    }
+    button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+    input {
+        font-size: 14px;
+        height: 50px;
+        padding: 15px 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .session {
+        padding: 10px;
+        box-shadow: none;
+    }
+    h4 {
+        font-size: 18px;
+    }
+    button {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+    a.discrete {
+        font-size: 12px;
+        margin-top: 20px;
+    }
+    input {
+        font-size: 13px;
+        height: 45px;
+        padding: 10px 0;
+    }
 }

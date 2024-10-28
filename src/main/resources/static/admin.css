@@ -50,7 +50,7 @@ body {
 header {
     width: 100%;
     padding: 20px;
-    background-color: transparent;
+    background-color: var(--color-background);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,7 +65,7 @@ header {
 }
 
 .logo {
-    height: 50px; /* Ajusta el tamaño del logo */
+    height: 50px;
     width: auto;
 }
 
@@ -75,7 +75,7 @@ header {
     font-size: 1.1rem;
     cursor: pointer;
     position: relative;
-    text-decoration: none; /* Elimina el subrayado predeterminado del enlace */
+    text-decoration: none;
     padding: 0px 10px 5px;
     transition: color 0.3s ease;
 }
@@ -87,16 +87,16 @@ header {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: var(--color-dark); /* Color de la línea */
-    transition: width 0.4s ease; /* Transición suave */
+    background-color: var(--color-dark);
+    transition: width 0.4s ease;
 }
 
 .login-button:hover::before {
-    width: 100%; /* La línea se expande al 100% en hover */
+    width: 100%;
 }
 
 .login-button:hover {
-    color: var(--color-dark); /* Asegura que el color del texto no cambie */
+    color: var(--color-dark);
 }
 
 .hey {
@@ -108,10 +108,10 @@ header {
 main {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Centra todos los contenedores */
-    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    justify-content: center;
+    align-items: flex-start;
     padding: 20px;
-    gap: 20px; /* Espacio entre secciones */
+    gap: 20px;
 }
 
 .flex-container {
@@ -131,15 +131,23 @@ section {
     transition: all 0.3s ease;
     flex: 1 1 45%;
     max-width: 45%;
-    min-width: 300px; /* Para evitar que se hagan demasiado pequeños */
+    min-width: 300px;
 }
 
 section:hover {
     box-shadow: none;
 }
 
+section > div {
+    padding-top: 0.7rem;
+}
+
+section > form {
+    padding-top: 0.7rem;
+}
+
 .project-details {
-    width: 100%; /* Asegura que el proyecto ocupe todo el ancho disponible */
+    width: 100%;
 }
 
 button {
@@ -150,8 +158,8 @@ button {
     cursor: pointer;
     position: relative;
     transition: color 0.3s ease;
-    border-bottom: 2px solid var(--color-primary); /* Añade borde solo en la parte inferior */
-    border-radius: 0; /* Sin borde redondeado */
+    border-bottom: 2px solid var(--color-primary);
+    border-radius: 0;
 }
 
 button::before {
@@ -161,16 +169,16 @@ button::before {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: var(--color-primary); /* Color de la línea */
+    background-color: var(--color-primary);
     transition: width 0.4s ease;
 }
 
 button:hover::before {
-    width: 100%; /* La línea se expande al 100% en hover */
+    width: 100%;
 }
 
 button:hover {
-    color: var(--color-dark); /* Cambia el color del texto en hover */
+    color: var(--color-dark);
 }
 
 h2, h3 {
@@ -240,23 +248,56 @@ form input {
     margin-bottom: 20px;
 }
 
-@media (max-width: 480px) {
-    button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
+@media (max-width: 768px) {
+    /* Ajuste de la estructura y tipografía para pantallas móviles */
+    header, .flex-container, main {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
     }
 
-    ul li {
-        font-size: 0.9rem;
-        padding: 10px;
+    section {
+        flex: 1 1 100%;
+        max-width: 100%;
     }
 
     h2, h3 {
         font-size: 1.2rem;
     }
 
+    button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
     form input {
         padding: 8px;
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes adicionales para pantallas extra pequeñas */
+    h2, h3 {
+        font-size: 1.1rem;
+    }
+
+    ul li {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    button, .login-button {
+        font-size: 0.8rem;
+        padding: 5px;
+    }
+
+    form input {
+        padding: 6px;
+        font-size: 0.8rem;
+    }
+
+    #projectTitle {
+        font-size: 1.1rem;
     }
 }
