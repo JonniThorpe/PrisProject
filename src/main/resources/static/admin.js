@@ -1,129 +1,119 @@
 // Variable global para almacenar el ID del proyecto seleccionado
 let selectedProjectId = null;
+let activeSection = null; // Variable para rastrear la sección o formulario activo
 
-// Función para mostrar los detalles del proyecto
+// Función para mostrar u ocultar la sección de detalles del proyecto
 function showProjectDetails(projectName, projectId) {
-    var projectDetailsSection = document.getElementById('projectDetails');
-    projectDetailsSection.classList.remove('hidden');
+    const projectDetailsSection = document.getElementById('projectDetails');
+    if (projectDetailsSection.classList.contains('hidden')) {
+        // Oculta la sección de detalles del proyecto
+        projectDetailsSection.classList.add('hidden');
+        document.getElementById('projectTitle').textContent = '';
 
-    var projectTitle = document.getElementById('projectTitle');
-    projectTitle.textContent = projectName;
+        // Asegura que el campo oculto para projectId tenga el valor correcto
+        document.getElementById('selectedProjectIdAssignClient').value = projectId;
+        document.getElementById('selectedProjectIdTask').value = projectId;
+        document.getElementById('selectedProjectIdBudget').value = projectId;
+    } else {
+        // Muestra la sección de detalles del proyecto
+        projectDetailsSection.classList.remove('hidden');
+        document.getElementById('projectTitle').textContent = projectName;
 
-    selectedProjectId = projectId;
+        // Asigna el ID del proyecto a los formularios relevantes
+        document.getElementById('selectedProjectIdAssignClient').value = projectId;
+        document.getElementById('selectedProjectIdTask').value = projectId;
+        document.getElementById('selectedProjectIdBudget').value = projectId;
 
-    // Mostrar solo las tareas del proyecto seleccionado
-    showProjectTasks(projectId);
+        selectedProjectId = projectId;
+        showProjectTasks(projectId);
+    }
 }
 
 // Función para mostrar solo las tareas correspondientes al proyecto seleccionado
 function showProjectTasks(projectId) {
-    var taskItems = document.querySelectorAll('#taskItems li');  // Selecciona todos los elementos de tarea
-
-    taskItems.forEach(function (taskItem) {
-        var taskProjectId = taskItem.getAttribute('data-project-id');
-        if (taskProjectId === projectId.toString()) {
-            taskItem.style.display = '';  // Mostrar tarea
-        } else {
-            taskItem.style.display = 'none';  // Ocultar tarea
-        }
+    const taskItems = document.querySelectorAll('#taskItems li');
+    taskItems.forEach((taskItem) => {
+        const taskProjectId = taskItem.getAttribute('data-project-id');
+        taskItem.style.display = taskProjectId === projectId.toString() ? '' : 'none';
     });
 }
 
-// Añadir evento de clic a cada elemento de la lista de proyectos
-document.addEventListener("DOMContentLoaded", function () {
-    var projectItems = document.querySelectorAll('.project-item');
-
-    projectItems.forEach(function (item) {
-        item.addEventListener('click', function () {
-            var projectName = item.textContent;
-            var projectId = item.getAttribute('data-project-id');
-            showProjectDetails(projectName, projectId);  // Mostrar los detalles del proyecto
-        });
-    });
-
-    // Botón "Ver Tareas"
-    document.getElementById('viewTasksBtn').addEventListener('click', function () {
-        if (selectedProjectId !== null) {
-            showProjectTasks(selectedProjectId);  // Filtrar tareas según el proyecto seleccionado
-        } else {
-            alert('Por favor, selecciona un proyecto primero.');
-        }
-    });
-});
-
-// Función para ocultar la sección de detalles del proyecto
-function hideProjectDetails() {
-    var projectDetailsSection = document.getElementById('projectDetails');
-    projectDetailsSection.classList.add('hidden');
+// Función para alternar la visibilidad de una sección, asegurando que solo una esté visible
+function toggleSection(section) {
+    if (activeSection && activeSection !== section) {
+        activeSection.classList.add('hidden'); // Oculta la sección activa anterior
+    }
+    if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        activeSection = section; // Actualiza la sección activa
+    } else {
+        section.classList.add('hidden'); // Oculta la sección si se hace clic nuevamente
+        activeSection = null; // Reinicia la sección activa
+    }
 }
 
-// Añadir evento de clic a cada elemento de la lista de proyectos
+// Configuración de eventos y lógica
 document.addEventListener("DOMContentLoaded", function () {
-    var projectItems = document.querySelectorAll('.project-item');
-
-    projectItems.forEach(function (item) {
+    // Evento de clic para cada proyecto
+    const projectItems = document.querySelectorAll('.project-item');
+    projectItems.forEach((item) => {
         item.addEventListener('click', function () {
-            var projectName = item.textContent;
-            var projectId = item.getAttribute('data-project-id'); // Obtener el ID del proyecto desde el atributo data
+            const projectName = item.textContent;
+            const projectId = item.getAttribute('data-project-id');
             showProjectDetails(projectName, projectId);
         });
     });
-});
 
-// Mostrar/Añadir tareas
-document.getElementById('addClientBtn').addEventListener('click', function () {
-    var taskForm = document.getElementById('clientForm');
-    taskForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
-});
+    // Botón "Asignar Cliente a Proyecto"
+    document.getElementById('assignProjectClientBtn').addEventListener('click', function () {
+        const assignClientForm = document.getElementById('assignClientForm');
+        console.log("Botón 'Asignar Cliente a Proyecto' clicado"); // Depuración
+        toggleSection(assignClientForm);
 
-// Mostrar/Añadir tareas
-document.getElementById('addTaskBtn').addEventListener('click', function () {
-    var taskForm = document.getElementById('taskForm');
-    taskForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+        // Asegura que el campo oculto para projectId tenga el valor correcto
+        if (selectedProjectId === null) {
+            alert('Selecciona un proyecto antes de asignar clientes.');
+        } else {
+            document.getElementById('selectedProjectIdAssignClient').value = selectedProjectId;
+            console.log("ID del proyecto asignado: ", selectedProjectId); // Depuración
+        }
+    });
 
-    // Si hay un proyecto seleccionado, actualizar el campo hidden con el ID del proyecto
-    if (selectedProjectId !== null) {
-        document.getElementById('selectedProjectIdTask').value = selectedProjectId;
-    } else {
-        alert('Selecciona un proyecto antes de añadir una tarea');
-    }
-});
+    // Mostrar/Añadir cliente
+    document.getElementById('addClientBtn').addEventListener('click', function () {
+        toggleSection(document.getElementById('clientForm'));
+    });
 
+    // Mostrar/Añadir tarea
+    document.getElementById('addTaskBtn').addEventListener('click', function () {
+        const taskForm = document.getElementById('taskForm');
+        toggleSection(taskForm);
+        if (selectedProjectId === null) {
+            alert('Selecciona un proyecto antes de añadir una tarea.');
+        }
+    });
 
-// Mostrar/Añadir presupuesto
-document.getElementById('addBudgetBtn').addEventListener('click', function () {
-    var budgetForm = document.getElementById('budgetForm');
-    budgetForm.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
+    // Mostrar/Añadir presupuesto
+    document.getElementById('addBudgetBtn').addEventListener('click', function () {
+        const budgetForm = document.getElementById('budgetForm');
+        toggleSection(budgetForm);
+        if (selectedProjectId === null) {
+            alert('Selecciona un proyecto antes de añadir un presupuesto.');
+        }
+    });
 
-    // Si hay un proyecto seleccionado, actualizar el campo hidden con el ID del proyecto
-    if (selectedProjectId !== null) {
-        document.getElementById('selectedProjectIdBudget').value = selectedProjectId;
-    } else {
-        alert('Selecciona un proyecto antes de añadir un presupuesto');
-    }
-});
+    // Ver lista de tareas
+    document.getElementById('viewTasksBtn').addEventListener('click', function () {
+        toggleSection(document.getElementById('taskList'));
+    });
 
+    // Ver lista de valoraciones
+    document.getElementById('viewRatingsBtn').addEventListener('click', function () {
+        toggleSection(document.getElementById('ratingList'));
+    });
 
-// Ver lista de tareas
-document.getElementById('viewTasksBtn').addEventListener('click', function () {
-    var taskList = document.getElementById('taskList');
-    taskList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
-});
-
-// Ver lista de valoraciones
-document.getElementById('viewRatingsBtn').addEventListener('click', function () {
-    var ratingList = document.getElementById('ratingList');
-    ratingList.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
-});
-
-// Ver cálculo de resultado
-document.getElementById('viewResultBtn').addEventListener('click', function () {
-    var resultCalculation = document.getElementById('resultCalculation');
-    resultCalculation.classList.toggle('hidden');  // Alternar entre mostrar y ocultar
-});
-
-// Redirigir a la página de detalles del proyecto cuando se selecciona uno
-document.addEventListener("DOMContentLoaded", function () {
-    var projectItems = document.querySelectorAll('.project-item');
-
+    // Ver cálculo de resultado
+    document.getElementById('viewResultBtn').addEventListener('click', function () {
+        toggleSection(document.getElementById('resultCalculation'));
+    });
 });

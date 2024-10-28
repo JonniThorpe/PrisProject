@@ -16,13 +16,10 @@
     <a class="login-button" th:href="@{/logout}">Cerrar Sesión</a>
 </header>
 
-<!--<p class='hey' th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'">¡Hola! ¿Qué tal estás?</p>-->
-
 <main class="admin-panel">
     <div class="flex-container">
         <section class="create-project">
             <h3 th:text="'Hola, ' + ${nombreUsuario} + '! ¿Listo para gestionar tus proyectos?'"></h3>
-            <!--<h2>Crear un nuevo proyecto</h2>-->
             <a th:href="@{/create}"><button id="createProjectBtn">Crear Proyecto</button></a>
         </section>
 
@@ -45,45 +42,53 @@
         <button id="addClientBtn">Añadir Cliente</button>
         <button id="addTaskBtn">Añadir Tarea</button>
         <button id="addBudgetBtn">Añadir Presupuesto</button>
-
         <button id="viewTasksBtn">Ver Tareas</button>
         <button id="viewRatingsBtn">Ver Valoraciones</button>
+        <button id="assignProjectClientBtn">Asignar Cliente a Proyecto</button>
         <button id="viewResultBtn">Ver Cálculo del Resultado</button>
 
+        <!-- Formulario para agregar cliente -->
         <form th:action="@{/admin/newClient}" method="post" id="clientForm" class="hidden">
+            <h3>Añadir Cliente</h3>
             <label for="clientName">Nick del Cliente:</label>
             <input type="text" name="nombre" id="clientName" required>
-
             <label for="clientPassword">Contraseña del Cliente:</label>
             <input type="password" name="contraseña" id="clientPassword" required>
-
             <button type="submit">Añadir Cliente</button>
         </form>
 
+        <!-- Formulario para asignar clientes a proyecto -->
+        <form th:action="@{/admin/assignClientToProject}" method="post" id="assignClientForm" class="hidden">
+            <h3>Asignar Clientes a Proyecto</h3>
+            <label>Selecciona Clientes:</label>
+            <select name="clientIds" id="clientSelect" multiple required>
+                <option th:each="client : ${clientes}" th:value="${client.id}" th:text="${client.nombre}"></option>
+            </select>
+            <input type="hidden" name="projectId" id="selectedProjectIdAssignClient" />
+            <button type="submit">Asignar Clientes</button>
+        </form>
 
+        <!-- Formulario para añadir tareas -->
         <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
+            <h3>Añadir Tarea</h3>
             <label for="taskName">Nombre de la Tarea:</label>
             <input type="text" name="nombre" id="taskName" required>
-
             <label for="taskEffort">Esfuerzo:</label>
             <input type="number" name="esfuerzo" id="taskEffort" required>
-
-            <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
             <input type="hidden" name="proyectoIdproyecto" id="selectedProjectIdTask" th:value="${selectedProjectId}" />
-
             <button type="submit">Añadir Tarea</button>
         </form>
 
+        <!-- Formulario para actualizar presupuesto -->
         <form th:action="@{/admin/updateBudget}" method="post" id="budgetForm" class="hidden">
+            <h3>Actualizar Presupuesto</h3>
             <label for="projectBudget">Nuevo Presupuesto:</label>
             <input type="number" name="pesoMaximoTareas" id="projectBudget" required>
-
-            <!-- Campo oculto para enviar el ID del proyecto seleccionado -->
             <input type="hidden" name="idProyecto" id="selectedProjectIdBudget" th:value="${selectedProjectId}">
-
             <button type="submit">Actualizar Presupuesto</button>
         </form>
 
+        <!-- Lista de tareas del proyecto -->
         <div id="taskList" class="hidden">
             <h3>Tareas</h3>
             <ul id="taskItems">
@@ -91,8 +96,7 @@
             </ul>
         </div>
 
-
-
+        <!-- Lista de valoraciones -->
         <div id="ratingList" class="hidden">
             <h3>Valoraciones de Clientes</h3>
             <ul>
@@ -102,8 +106,7 @@
             </ul>
         </div>
 
-
-
+        <!-- Cálculo del resultado -->
         <div id="resultCalculation" class="hidden">
             <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
             <ul>

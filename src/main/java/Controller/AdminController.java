@@ -1,6 +1,7 @@
 package Controller;
 
 import entidades.Proyecto;
+import entidades.ProyectoHasUsuario;
 import entidades.Tarea;
 import entidades.Usuario;
 import jakarta.servlet.http.HttpSession;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import repository.ProyectoHasUsuarioRepository;
 import repository.ProyectoRepository;
 import repository.TareaRepository;
 import repository.UsuarioRepository;
@@ -28,6 +30,9 @@ public class AdminController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ProyectoHasUsuarioRepository proyectoHasUsuarioRepository;
 
     @GetMapping("/admin")
     public String mostrarPanelAdmin(HttpSession session, Model model) {
@@ -58,10 +63,14 @@ public class AdminController {
         // Consultar todas las tareas de los proyectos del usuario
         List<Tarea> todasLasTareas = tareaRepository.findAllByProyectoUsuarioId(idUsuario);
 
+        List<Usuario> clientes = usuarioRepository.findByRol("Client"); // Busca solo los usuarios con rol "Client"
+
+
         // Añadir los proyectos, tareas y datos del usuario al modelo para mostrar en la página
         model.addAttribute("proyectos", proyectos);
         model.addAttribute("tareas", todasLasTareas);  // Añadir todas las tareas
         model.addAttribute("nombreUsuario", nombreUsuario);
+        model.addAttribute("clientes", clientes);
 
         return "admin";  // Retorna la vista admin.html
     }
@@ -184,6 +193,47 @@ public class AdminController {
         model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
 
         return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/assignClientToProject")
+    public String assignClientToProject(@RequestParam("projectId") Integer projectId,
+                                        @RequestParam("clientIds") List<Integer> clientIds,
+                                        HttpSession session, Model model) {
+
+        // Verifica que el administrador esté logueado
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/login";
+        }
+
+        // Validar que projectId y clientIds no sean nulos
+        if (projectId == null || clientIds == null) {
+            model.addAttribute("error", "No se ha seleccionado un proyecto o clientes para asignar.");
+            return "admin"; // Retorna a la página de admin con el mensaje de error
+        }
+
+        // Buscar el proyecto por ID
+        Optional<Proyecto> proyectoOptional = proyectoRepository.findById(Long.valueOf(projectId));
+        if (proyectoOptional.isEmpty()) {
+            model.addAttribute("mensaje", "Proyecto no encontrado.");
+            return "redirect:/admin";
+        }
+
+        Proyecto proyecto = proyectoOptional.get();
+
+        // Asignar cada cliente al proyecto
+        for (Integer clientId : clientIds) {
+            Usuario usuario = usuarioRepository.findById(clientId).orElse(null);
+            if (usuario != null) {
+                ProyectoHasUsuario proyectoHasUsuario = new ProyectoHasUsuario();
+                proyectoHasUsuario.setUsuarioIdusuario(usuario);
+                proyectoHasUsuario.setProyectoIdproyecto(proyecto);
+                proyectoHasUsuarioRepository.save(proyectoHasUsuario);
+            }
+        }
+
+        model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito.");
+        return "redirect:/admin";  // Redirige al panel del administrador con la lista actualizada
     }
 
 }

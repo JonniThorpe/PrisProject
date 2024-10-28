@@ -115,16 +115,16 @@ main {
 }
 
 .introbg {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        background-size: cover;
-        background-position: center;
-        padding: 100px 20px;
-        width: 100%; /* Asegura que la imagen ocupe todo el ancho de la pantalla */
-        background-color: rgba(0, 0, 0, 0.3);
-        color: var(--color-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    width: 100%; /* Asegura que la imagen ocupe todo el ancho de la pantalla */
+    background-color: rgba(0, 0, 0, 0.3);
+    color: var(--color-white);
 }
 
 .intro .content {
