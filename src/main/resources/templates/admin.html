@@ -27,14 +27,15 @@
             <h2>Proyectos</h2>
             <ul>
                 <!-- Itera sobre los proyectos disponibles -->
-                <li th:each="proyecto : ${proyectos}"
-                    th:data-project-id="${proyecto.id}"
-                    th:text="${proyecto.nombre}"
-                    class="project-item">
-                    <!-- El nombre del proyecto se muestra y el ID se guarda en data-project-id -->
+                <li th:each="proyecto : ${proyectos}" class="project-item" th:data-project-id="${proyecto.id}">
+                    <span th:text="${proyecto.nombre}"></span> <!-- Muestra el nombre del proyecto -->
+                    <a th:href="@{/admin/result(idProyecto=${proyecto.id})}">
+                        <button>Ver Cálculo del Resultado</button>
+                    </a>
                 </li>
             </ul>
         </section>
+
     </div>
     <section id="projectDetails" class="project-details hidden">
         <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
@@ -45,7 +46,6 @@
         <button id="viewTasksBtn">Ver Tareas</button>
         <button id="viewRatingsBtn">Ver Valoraciones</button>
         <button id="assignProjectClientBtn">Asignar Cliente a Proyecto</button>
-        <button id="viewResultBtn">Ver Cálculo del Resultado</button>
 
         <!-- Formulario para agregar cliente -->
         <form th:action="@{/admin/newClient}" method="post" id="clientForm" class="hidden">
@@ -107,18 +107,6 @@
             </div>
         </div>
 
-
-
-
-        <!-- Cálculo del resultado -->
-        <div id="resultCalculation" class="hidden">
-            <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
-            <ul>
-                <li>Tarea 1 - 70% Importancia - Valoración Cliente: 4/5</li>
-                <li>Tarea 2 - 50% Importancia - Valoración Cliente: 3/5</li>
-                <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
-            </ul>
-        </div>
     </section>
 </main>
 

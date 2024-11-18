@@ -1,5 +1,6 @@
 package Controller;
 
+import dto.ResultadoTareaDTO;
 import dto.ValoracionDTO;
 import entidades.*;
 import jakarta.servlet.http.HttpSession;
@@ -51,13 +52,13 @@ public class AdminController {
         Usuario usuario = new Usuario();
         usuario.setId(idUsuario);
 
+        // Obtener proyectos, tareas y clientes
         List<Proyecto> proyectos = proyectoRepository.findByUsuarioIdusuario(usuario);
         List<Tarea> todasLasTareas = tareaRepository.findAllByProyectoUsuarioId(idUsuario);
         List<Usuario> clientes = usuarioRepository.findByRol("Client");
 
-        // Cargar valoraciones de clientes para cada tarea y organizarlas para la vista
+        // Procesar valoraciones de clientes
         List<ValoracionDTO> valoraciones = new ArrayList<>();
-
         for (Proyecto proyecto : proyectos) {
             List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
 
@@ -66,7 +67,6 @@ public class AdminController {
 
                 for (Tarea tarea : todasLasTareas) {
                     if (tarea.getProyectoIdproyecto().getId().equals(proyecto.getId())) {
-                        // Buscar si el cliente ha valorado esta tarea
                         Optional<UsuarioValoraTarea> valoracionOpt = tarea.getUsuarioValoraTareas()
                                 .stream()
                                 .filter(v -> v.getUsuarioIdusuario().getId().equals(cliente.getId()))
@@ -79,6 +79,8 @@ public class AdminController {
             }
         }
 
+
+        // Agregar atributos al modelo
         model.addAttribute("proyectos", proyectos);
         model.addAttribute("nombreUsuario", nombreUsuario);
         model.addAttribute("clientes", clientes);
@@ -88,8 +90,46 @@ public class AdminController {
         return "admin";
     }
 
+    @GetMapping("/admin/result")
+    public String mostrarResultadoProyecto(@RequestParam("idProyecto") Long idProyecto, HttpSession session, Model model) {
+        String rolUsuario = (String) session.getAttribute("rol");
 
+        if (rolUsuario == null) {
+            return "redirect:/login";
+        } else if (rolUsuario.equals("Client")) {
+            return "redirect:/client";
+        }
 
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+
+        if (idUsuario == null) {
+            return "redirect:/login";
+        }
+
+        // Verificar si el proyecto pertenece al usuario
+        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
+        if (proyectoOpt.isEmpty() || !proyectoOpt.get().getUsuarioIdusuario().getId().equals(idUsuario)) {
+            return "redirect:/admin";
+        }
+
+        Proyecto proyecto = proyectoOpt.get();
+
+        // Obtener los resultados del cálculo para este proyecto
+        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+
+        List<ResultadoTareaDTO> resultadoDTOs = new ArrayList<>();
+        for (Object[] resultado : resultados) {
+            Long idTarea = ((Number) resultado[0]).longValue();
+            String nombreTarea = (String) resultado[1];
+            Double valoracionPonderada = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
+            resultadoDTOs.add(new ResultadoTareaDTO(idTarea, nombreTarea, valoracionPonderada));
+        }
+
+        model.addAttribute("proyecto", proyecto);
+        model.addAttribute("resultados", resultadoDTOs);
+
+        return "projectResults";
+    }
 
 
     @PostMapping("/admin/updateBudget")

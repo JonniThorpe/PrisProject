@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Proyecto</title>
+    <link th:href="@{/admin.css}" rel="stylesheet">
+    <link rel="stylesheet" href="/src/main/resources/static/admin.css">
+</head>
+<body>
+<header>
+    <h1 th:text="'Resultados para el proyecto: ' + ${proyecto.nombre}"></h1>
+    <a th:href="@{/admin}">Volver al Panel</a>
+</header>
+
+<main>
+    <section>
+        <h2>Cálculo del Resultado</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID Tarea</th>
+                <th>Nombre Tarea</th>
+                <th>Valoración Ponderada</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="resultado : ${resultados}">
+                <td th:text="${resultado.idTarea}"></td>
+                <td th:text="${resultado.nombreTarea}"></td>
+                <td>
+                    <span th:if="${resultado.valoracionPonderada != null}" th:text="${resultado.valoracionPonderada}"></span>
+                    <span th:if="${resultado.valoracionPonderada == null}">Sin valoración</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
