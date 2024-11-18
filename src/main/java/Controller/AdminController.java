@@ -254,21 +254,21 @@ public class AdminController {
     @PostMapping("/admin/assignClientToProject")
     public String assignClientToProject(@RequestParam("projectId") Integer projectId,
                                         @RequestParam("clientIds") List<Integer> clientIds,
+                                        @RequestParam("pesoCliente") Integer pesoCliente,
                                         HttpSession session, Model model) {
-
         // Verifica que el administrador esté logueado
         Integer idUsuario = (Integer) session.getAttribute("idUsuario");
         if (idUsuario == null) {
             return "redirect:/login";
         }
 
-        // Validar que projectId y clientIds no sean nulos
-        if (projectId == null || clientIds == null) {
-            model.addAttribute("error", "No se ha seleccionado un proyecto o clientes para asignar.");
+        // Validar que projectId, clientIds y pesoCliente no sean nulos
+        if (projectId == null || clientIds == null || pesoCliente == null) {
+            model.addAttribute("error", "No se ha seleccionado un proyecto, clientes o el peso no es válido.");
             return "admin";
         }
 
-        // Buscar el proyecto por ID y asegurarse de que esté completamente cargado
+        // Buscar el proyecto por ID
         Optional<Proyecto> proyectoOptional = proyectoRepository.findById(Long.valueOf(projectId));
         if (proyectoOptional.isEmpty()) {
             model.addAttribute("mensaje", "Proyecto no encontrado.");
@@ -276,30 +276,29 @@ public class AdminController {
         }
         Proyecto proyecto = proyectoOptional.get();
 
-        // Asignar cada cliente al proyecto y guardar la relación en la base de datos
+        // Asignar cada cliente al proyecto con el peso especificado
         for (Integer clientId : clientIds) {
             Usuario usuario = usuarioRepository.findById(clientId).orElse(null);
             if (usuario != null) {
                 ProyectoHasUsuario proyectoHasUsuario = new ProyectoHasUsuario();
 
-                // Inicializar la ID compuesta
+                // Configurar la ID compuesta
                 ProyectoHasUsuarioId proyectoHasUsuarioId = new ProyectoHasUsuarioId();
                 proyectoHasUsuarioId.setProyectoIdproyecto(proyecto.getId());
                 proyectoHasUsuarioId.setUsuarioIdusuario(usuario.getId());
 
-                // Configurar la ID embebida en ProyectoHasUsuario
+                // Asignar las entidades relacionadas y el peso
                 proyectoHasUsuario.setId(proyectoHasUsuarioId);
-
-                // Asignar las entidades relacionadas
                 proyectoHasUsuario.setProyectoIdproyecto(proyecto);
                 proyectoHasUsuario.setUsuarioIdusuario(usuario);
+                proyectoHasUsuario.setPesoCliente(pesoCliente);
 
-                // Guardar la entidad en la base de datos
+                // Guardar la relación en la base de datos
                 proyectoHasUsuarioRepository.save(proyectoHasUsuario);
             }
         }
 
-        model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito.");
-        return "redirect:/admin";  // Redirige al panel del administrador con la lista actualizada
+        model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito con el peso especificado.");
+        return "redirect:/admin";
     }
 }

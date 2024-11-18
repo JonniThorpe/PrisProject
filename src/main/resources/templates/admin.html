@@ -57,16 +57,18 @@
             <button type="submit">Añadir Cliente</button>
         </form>
 
-        <!-- Formulario para asignar clientes a proyecto -->
         <form th:action="@{/admin/assignClientToProject}" method="post" id="assignClientForm" class="hidden">
             <h3>Asignar Clientes a Proyecto</h3>
             <label>Selecciona Clientes:</label>
             <select name="clientIds" id="clientSelect" multiple required>
                 <option th:each="client : ${clientes}" th:value="${client.id}" th:text="${client.nombre}"></option>
             </select>
+            <label for="pesoCliente">Peso Cliente:</label>
+            <input type="number" name="pesoCliente" id="pesoCliente" min="1" max="100" required>
             <input type="hidden" name="projectId" id="selectedProjectIdAssignClient" />
             <button type="submit">Asignar Clientes</button>
         </form>
+
 
         <!-- Formulario para añadir tareas -->
         <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
