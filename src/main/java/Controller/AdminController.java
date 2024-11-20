@@ -1,5 +1,6 @@
 package Controller;
 
+import dto.ResultadoTareaDTO;
 import dto.ValoracionDTO;
 import entidades.*;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import repository.ProyectoHasUsuarioRepository;
 import repository.ProyectoRepository;
 import repository.TareaRepository;
+
 import repository.UsuarioRepository;
 
 import java.util.*;
@@ -51,13 +53,13 @@ public class AdminController {
         Usuario usuario = new Usuario();
         usuario.setId(idUsuario);
 
+        // Obtener proyectos, tareas y clientes
         List<Proyecto> proyectos = proyectoRepository.findByUsuarioIdusuario(usuario);
         List<Tarea> todasLasTareas = tareaRepository.findAllByProyectoUsuarioId(idUsuario);
         List<Usuario> clientes = usuarioRepository.findByRol("Client");
 
-        // Cargar valoraciones de clientes para cada tarea y organizarlas para la vista
+        // Procesar valoraciones de clientes
         List<ValoracionDTO> valoraciones = new ArrayList<>();
-
         for (Proyecto proyecto : proyectos) {
             List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
 
@@ -66,7 +68,6 @@ public class AdminController {
 
                 for (Tarea tarea : todasLasTareas) {
                     if (tarea.getProyectoIdproyecto().getId().equals(proyecto.getId())) {
-                        // Buscar si el cliente ha valorado esta tarea
                         Optional<UsuarioValoraTarea> valoracionOpt = tarea.getUsuarioValoraTareas()
                                 .stream()
                                 .filter(v -> v.getUsuarioIdusuario().getId().equals(cliente.getId()))
@@ -79,6 +80,8 @@ public class AdminController {
             }
         }
 
+
+        // Agregar atributos al modelo
         model.addAttribute("proyectos", proyectos);
         model.addAttribute("nombreUsuario", nombreUsuario);
         model.addAttribute("clientes", clientes);
@@ -88,6 +91,42 @@ public class AdminController {
         return "admin";
     }
 
+    @GetMapping("/admin/result")
+    public String mostrarResultadoProyecto(@RequestParam("idProyecto") Long idProyecto, HttpSession session, Model model) {
+        String rolUsuario = (String) session.getAttribute("rol");
+
+        if (rolUsuario == null || session.getAttribute("idUsuario") == null) {
+            return "redirect:/login";
+        }
+
+        // Verificar si el proyecto pertenece al usuario
+        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
+        if (proyectoOpt.isEmpty()) {
+            return "redirect:/admin";
+        }
+
+        Proyecto proyecto = proyectoOpt.get();
+
+        // Obtener los resultados del cálculo para este proyecto
+        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+
+        List<ResultadoTareaDTO> resultadoDTOs = new ArrayList<>();
+        for (Object[] resultado : resultados) {
+            Long idTarea = ((Number) resultado[0]).longValue();
+            String nombreTarea = (String) resultado[1];
+            Integer esfuerzo = ((Number) resultado[2]).intValue();
+            Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+            resultadoDTOs.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
+        }
+
+        // Ordenar por valoración ponderada descendente
+        resultadoDTOs.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
+
+        model.addAttribute("proyecto", proyecto);
+        model.addAttribute("resultados", resultadoDTOs);
+
+        return "projectResults";
+    }
 
 
 
@@ -132,7 +171,7 @@ public class AdminController {
         List<Proyecto> proyectos = proyectoRepository.findByUsuarioIdusuario(usuario);
         model.addAttribute("proyectos", proyectos);
 
-        return "admin";  // Retorna la vista admin.html actualizada
+        return "redirect:/admin";  // Retorna la vista admin.html actualizada
     }
 
     @PostMapping("/admin/addTask")
@@ -214,21 +253,21 @@ public class AdminController {
     @PostMapping("/admin/assignClientToProject")
     public String assignClientToProject(@RequestParam("projectId") Integer projectId,
                                         @RequestParam("clientIds") List<Integer> clientIds,
+                                        @RequestParam("pesoCliente") Integer pesoCliente,
                                         HttpSession session, Model model) {
-
         // Verifica que el administrador esté logueado
         Integer idUsuario = (Integer) session.getAttribute("idUsuario");
         if (idUsuario == null) {
             return "redirect:/login";
         }
 
-        // Validar que projectId y clientIds no sean nulos
-        if (projectId == null || clientIds == null) {
-            model.addAttribute("error", "No se ha seleccionado un proyecto o clientes para asignar.");
+        // Validar que projectId, clientIds y pesoCliente no sean nulos
+        if (projectId == null || clientIds == null || pesoCliente == null) {
+            model.addAttribute("error", "No se ha seleccionado un proyecto, clientes o el peso no es válido.");
             return "admin";
         }
 
-        // Buscar el proyecto por ID y asegurarse de que esté completamente cargado
+        // Buscar el proyecto por ID
         Optional<Proyecto> proyectoOptional = proyectoRepository.findById(Long.valueOf(projectId));
         if (proyectoOptional.isEmpty()) {
             model.addAttribute("mensaje", "Proyecto no encontrado.");
@@ -236,30 +275,29 @@ public class AdminController {
         }
         Proyecto proyecto = proyectoOptional.get();
 
-        // Asignar cada cliente al proyecto y guardar la relación en la base de datos
+        // Asignar cada cliente al proyecto con el peso especificado
         for (Integer clientId : clientIds) {
             Usuario usuario = usuarioRepository.findById(clientId).orElse(null);
             if (usuario != null) {
                 ProyectoHasUsuario proyectoHasUsuario = new ProyectoHasUsuario();
 
-                // Inicializar la ID compuesta
+                // Configurar la ID compuesta
                 ProyectoHasUsuarioId proyectoHasUsuarioId = new ProyectoHasUsuarioId();
                 proyectoHasUsuarioId.setProyectoIdproyecto(proyecto.getId());
                 proyectoHasUsuarioId.setUsuarioIdusuario(usuario.getId());
 
-                // Configurar la ID embebida en ProyectoHasUsuario
+                // Asignar las entidades relacionadas y el peso
                 proyectoHasUsuario.setId(proyectoHasUsuarioId);
-
-                // Asignar las entidades relacionadas
                 proyectoHasUsuario.setProyectoIdproyecto(proyecto);
                 proyectoHasUsuario.setUsuarioIdusuario(usuario);
+                proyectoHasUsuario.setPesoCliente(pesoCliente);
 
-                // Guardar la entidad en la base de datos
+                // Guardar la relación en la base de datos
                 proyectoHasUsuarioRepository.save(proyectoHasUsuario);
             }
         }
 
-        model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito.");
-        return "redirect:/admin";  // Redirige al panel del administrador con la lista actualizada
+        model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito con el peso especificado.");
+        return "redirect:/admin";
     }
 }

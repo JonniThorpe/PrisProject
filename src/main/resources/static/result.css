@@ -1,0 +1,224 @@
+:root {
+    --color-primary: #cdbfa3;
+    --color-danger: #FF0060;
+    --color-success: #1B9C85;
+    --color-warning: #F7D060;
+    --color-white: #fff;
+    --color-info-dark: #7d8da1;
+    --color-dark: #55503a;
+    --color-light: rgba(243, 221, 170, 0.18);
+    --color-dark-variant: #677483;
+    --color-background: #f6f6f9;
+
+    --border-radius-1: 0.4rem;
+    --card-padding: 1.8rem;
+    --padding-1: 1.2rem;
+
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    border: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-size: 0.88rem;
+    user-select: none;
+    overflow-x: hidden;
+    color: var(--color-dark);
+    background-color: var(--color-background);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: transparent;
+}
+
+/* Estilo del SVG de retroceso */
+.back-svg {
+    width: 32px; /* Ajusta el tamaño del SVG */
+    height: auto;
+    cursor: pointer;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-dark);
+}
+
+/* Resto del formulario y layout */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+}
+
+section {
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius-1);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 800px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.1);
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, button {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: var(--border-radius-1);
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+button {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--color-dark);
+}
+
+/* Ajustes para el enlace SVG */
+.atras {
+    width: 32px;
+    height: 32px;
+    margin-right: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.atras:hover {
+    transform: scale(1.1); /* Efecto de agrandamiento al pasar por encima */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 1rem;
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-1);
+    overflow: hidden;
+}
+
+thead {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-weight: bold;
+}
+
+thead th {
+    padding: var(--padding-1);
+    text-align: left;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--color-light);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: var(--color-light);
+    transform: translateX(5px);
+}
+
+tbody td {
+    padding: var(--padding-1);
+    color: var(--color-dark);
+    text-align: left;
+}
+
+tbody td span {
+    font-weight: bold;
+    color: var(--color-success);
+}
+
+tbody td span:empty {
+    color: var(--color-danger);
+}
+
+button {
+    background-color: transparent;
+    color: var(--color-primary);
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: 2px solid var(--color-primary);
+    border-radius: var(--border-radius-1);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    header, main {
+        padding: 10px;
+    }
+
+    section {
+        padding: var(--padding-1);
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1rem;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+
+    button {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+}

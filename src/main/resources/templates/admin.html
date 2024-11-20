@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrador</title>
     <link th:href="@{/admin.css}" rel="stylesheet">
-    <link rel="stylesheet" href="/src/main/resources/static/index.css">
+    <link rel="stylesheet" href="/src/main/resources/static/admin.css">
 </head>
 <body>
 <header>
@@ -27,25 +27,28 @@
             <h2>Proyectos</h2>
             <ul>
                 <!-- Itera sobre los proyectos disponibles -->
-                <li th:each="proyecto : ${proyectos}"
-                    th:data-project-id="${proyecto.id}"
-                    th:text="${proyecto.nombre}"
-                    class="project-item">
-                    <!-- El nombre del proyecto se muestra y el ID se guarda en data-project-id -->
+                <li th:each="proyecto : ${proyectos}" class="project-item" th:data-project-id="${proyecto.id}">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span th:text="${proyecto.nombre}"></span> <!-- Muestra el nombre del proyecto -->
+                        <a th:href="@{/admin/result(idProyecto=${proyecto.id})}" class="result-button" style="text-decoration: none;">
+                            <img th:src="@{/images/result.svg}" alt="Back" class="result-svg" style="width: 24px; height: 24px; cursor: pointer;">
+                        </a>
+                    </div>
                 </li>
             </ul>
         </section>
+
+
     </div>
     <section id="projectDetails" class="project-details hidden">
         <h2>Proyecto <span id="projectTitle">Nombre del proyecto</span></h2>
 
         <button id="addClientBtn">Añadir Cliente</button>
         <button id="addTaskBtn">Añadir Tarea</button>
-        <button id="addBudgetBtn">Añadir Presupuesto</button>
+        <button id="addBudgetBtn">Actualizar Presupuesto</button>
         <button id="viewTasksBtn">Ver Tareas</button>
         <button id="viewRatingsBtn">Ver Valoraciones</button>
         <button id="assignProjectClientBtn">Asignar Cliente a Proyecto</button>
-        <button id="viewResultBtn">Ver Cálculo del Resultado</button>
 
         <!-- Formulario para agregar cliente -->
         <form th:action="@{/admin/newClient}" method="post" id="clientForm" class="hidden">
@@ -57,16 +60,18 @@
             <button type="submit">Añadir Cliente</button>
         </form>
 
-        <!-- Formulario para asignar clientes a proyecto -->
         <form th:action="@{/admin/assignClientToProject}" method="post" id="assignClientForm" class="hidden">
             <h3>Asignar Clientes a Proyecto</h3>
             <label>Selecciona Clientes:</label>
             <select name="clientIds" id="clientSelect" multiple required>
                 <option th:each="client : ${clientes}" th:value="${client.id}" th:text="${client.nombre}"></option>
             </select>
+            <label for="pesoCliente">Peso Cliente:</label>
+            <input type="number" name="pesoCliente" id="pesoCliente" min="1" max="100" required>
             <input type="hidden" name="projectId" id="selectedProjectIdAssignClient" />
             <button type="submit">Asignar Clientes</button>
         </form>
+
 
         <!-- Formulario para añadir tareas -->
         <form th:action="@{/admin/addTask}" method="post" id="taskForm" class="hidden">
@@ -107,18 +112,6 @@
             </div>
         </div>
 
-
-
-
-        <!-- Cálculo del resultado -->
-        <div id="resultCalculation" class="hidden">
-            <h3>Cálculo del Resultado (Importancia y Valoración)</h3>
-            <ul>
-                <li>Tarea 1 - 70% Importancia - Valoración Cliente: 4/5</li>
-                <li>Tarea 2 - 50% Importancia - Valoración Cliente: 3/5</li>
-                <li>Tarea 3 - 30% Importancia - Valoración Cliente: 5/5</li>
-            </ul>
-        </div>
     </section>
 </main>
 

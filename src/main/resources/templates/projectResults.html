@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Proyecto</title>
+    <link th:href="@{/result.css}" rel="stylesheet">
+    <link rel="stylesheet" href="/src/main/resources/static/result.css">
+</head>
+<body>
+<header>
+    <!-- Enlace con el SVG para regresar a /admin -->
+    <a th:href="@{/admin}" class="back-button">
+        <img th:src="@{/images/flecha.svg}" alt="Back" class="back-svg">
+    </a>
+    <h1 th:text="'Resultados para el proyecto ' + ${proyecto.nombre}"></h1>
+</header>
+
+<main>
+    <section>
+        <h2>Cálculo del Resultado</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID Tarea</th>
+                <th>Nombre Tarea</th>
+                <th>Esfuerzo</th> <!-- Nueva columna para esfuerzo -->
+                <th>Valoración Ponderada</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="resultado : ${resultados}">
+                <td th:text="${resultado.idTarea}"></td>
+                <td th:text="${resultado.nombreTarea}"></td>
+                <td th:text="${resultado.esfuerzo}"></td> <!-- Mostrar esfuerzo -->
+                <td>
+                    <span th:if="${resultado.valoracionPonderada != null}" th:text="${resultado.valoracionPonderada}"></span>
+                    <span th:if="${resultado.valoracionPonderada == null}">Sin valoración</span>
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+    </section>
+</main>
+</body>
+</html>

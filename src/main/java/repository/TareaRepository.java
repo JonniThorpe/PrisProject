@@ -36,8 +36,25 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
     @Query("SELECT t FROM Tarea t WHERE t.proyectoIdproyecto.usuarioIdusuario.id = :usuarioId")
     List<Tarea> findAllByProyectoUsuarioId(@Param("usuarioId") Integer usuarioId);
 
-    @Query("SELECT t.id, t.nombre AS nombreTarea, " + "SUM(uvt.valoracion * pu.pesoCliente) AS sumatoriaValoracionesPonderadas " + "FROM Proyecto p " + "JOIN p.tareas t " + "JOIN t.usuarioValoraTareas uvt " + "JOIN p.proyectoHasUsuarios pu ON pu.usuarioIdusuario.id = uvt.usuarioIdusuario.id " + "JOIN Usuario u ON pu.usuarioIdusuario.id = u.id " + "WHERE p.id = :idProyecto " + "AND u.rol = :rolCliente " + "GROUP BY t.id, t.nombre " + "HAVING COUNT(CASE WHEN uvt.valorada = 0 THEN 1 END) = 0")
-    List<Object[]> obtenerTareasConValoracionPonderada(@Param("idProyecto") Long idProyecto, @Param("rolCliente") String rolCliente
+    @Query(
+            "SELECT t.id AS idTarea, " +
+                    "       t.nombre AS nombreTarea, " +
+                    "       t.esfuerzo AS esfuerzoTarea, " + // Agregar el esfuerzo
+                    "       SUM(uvt.valoracion * pu.pesoCliente) AS sumatoriaValoracionesPonderadas " +
+                    "FROM Proyecto p " +
+                    "JOIN p.tareas t " +
+                    "JOIN t.usuarioValoraTareas uvt " +
+                    "JOIN p.proyectoHasUsuarios pu ON pu.usuarioIdusuario.id = uvt.usuarioIdusuario.id " +
+                    "JOIN Usuario u ON pu.usuarioIdusuario.id = u.id " +
+                    "WHERE p.id = :idProyecto " +
+                    "  AND u.rol = :rolCliente " +
+                    "GROUP BY t.id, t.nombre, t.esfuerzo " + // Incluir esfuerzo en el GROUP BY
+                    "HAVING COUNT(CASE WHEN uvt.valorada = 0 THEN 1 END) = 0"
+    )
+    List<Object[]> obtenerTareasConValoracionPonderada(
+            @Param("idProyecto") Long idProyecto,
+            @Param("rolCliente") String rolCliente
     );
+
 }
 
