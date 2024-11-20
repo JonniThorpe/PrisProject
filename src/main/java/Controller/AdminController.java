@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import repository.ProyectoHasUsuarioRepository;
 import repository.ProyectoRepository;
 import repository.TareaRepository;
+
 import repository.UsuarioRepository;
 
 import java.util.*;
@@ -94,21 +95,13 @@ public class AdminController {
     public String mostrarResultadoProyecto(@RequestParam("idProyecto") Long idProyecto, HttpSession session, Model model) {
         String rolUsuario = (String) session.getAttribute("rol");
 
-        if (rolUsuario == null) {
-            return "redirect:/login";
-        } else if (rolUsuario.equals("Client")) {
-            return "redirect:/client";
-        }
-
-        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
-
-        if (idUsuario == null) {
+        if (rolUsuario == null || session.getAttribute("idUsuario") == null) {
             return "redirect:/login";
         }
 
         // Verificar si el proyecto pertenece al usuario
         Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
-        if (proyectoOpt.isEmpty() || !proyectoOpt.get().getUsuarioIdusuario().getId().equals(idUsuario)) {
+        if (proyectoOpt.isEmpty()) {
             return "redirect:/admin";
         }
 
@@ -121,15 +114,21 @@ public class AdminController {
         for (Object[] resultado : resultados) {
             Long idTarea = ((Number) resultado[0]).longValue();
             String nombreTarea = (String) resultado[1];
-            Double valoracionPonderada = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
-            resultadoDTOs.add(new ResultadoTareaDTO(idTarea, nombreTarea, valoracionPonderada));
+            Integer esfuerzo = ((Number) resultado[2]).intValue();
+            Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+            resultadoDTOs.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
         }
+
+        // Ordenar por valoración ponderada descendente
+        resultadoDTOs.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
         model.addAttribute("proyecto", proyecto);
         model.addAttribute("resultados", resultadoDTOs);
 
         return "projectResults";
     }
+
+
 
 
     @PostMapping("/admin/updateBudget")
@@ -172,7 +171,7 @@ public class AdminController {
         List<Proyecto> proyectos = proyectoRepository.findByUsuarioIdusuario(usuario);
         model.addAttribute("proyectos", proyectos);
 
-        return "admin";  // Retorna la vista admin.html actualizada
+        return "redirect:/admin";  // Retorna la vista admin.html actualizada
     }
 
     @PostMapping("/admin/addTask")

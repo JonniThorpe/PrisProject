@@ -37,7 +37,9 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
     List<Tarea> findAllByProyectoUsuarioId(@Param("usuarioId") Integer usuarioId);
 
     @Query(
-            "SELECT t.id, t.nombre AS nombreTarea, " +
+            "SELECT t.id AS idTarea, " +
+                    "       t.nombre AS nombreTarea, " +
+                    "       t.esfuerzo AS esfuerzoTarea, " + // Agregar el esfuerzo
                     "       SUM(uvt.valoracion * pu.pesoCliente) AS sumatoriaValoracionesPonderadas " +
                     "FROM Proyecto p " +
                     "JOIN p.tareas t " +
@@ -46,10 +48,13 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
                     "JOIN Usuario u ON pu.usuarioIdusuario.id = u.id " +
                     "WHERE p.id = :idProyecto " +
                     "  AND u.rol = :rolCliente " +
-                    "GROUP BY t.id, t.nombre " +
+                    "GROUP BY t.id, t.nombre, t.esfuerzo " + // Incluir esfuerzo en el GROUP BY
                     "HAVING COUNT(CASE WHEN uvt.valorada = 0 THEN 1 END) = 0"
     )
-    List<Object[]> obtenerTareasConValoracionPonderada(@Param("idProyecto") Long idProyecto, @Param("rolCliente") String rolCliente
+    List<Object[]> obtenerTareasConValoracionPonderada(
+            @Param("idProyecto") Long idProyecto,
+            @Param("rolCliente") String rolCliente
     );
+
 }
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrador</title>
     <link th:href="@{/admin.css}" rel="stylesheet">
-    <link rel="stylesheet" href="/src/main/resources/static/index.css">
+    <link rel="stylesheet" href="/src/main/resources/static/admin.css">
 </head>
 <body>
 <header>
@@ -28,13 +28,16 @@
             <ul>
                 <!-- Itera sobre los proyectos disponibles -->
                 <li th:each="proyecto : ${proyectos}" class="project-item" th:data-project-id="${proyecto.id}">
-                    <span th:text="${proyecto.nombre}"></span> <!-- Muestra el nombre del proyecto -->
-                    <a th:href="@{/admin/result(idProyecto=${proyecto.id})}">
-                        <button>Ver Cálculo del Resultado</button>
-                    </a>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span th:text="${proyecto.nombre}"></span> <!-- Muestra el nombre del proyecto -->
+                        <a th:href="@{/admin/result(idProyecto=${proyecto.id})}" class="result-button" style="text-decoration: none;">
+                            <img th:src="@{/images/result.svg}" alt="Back" class="result-svg" style="width: 24px; height: 24px; cursor: pointer;">
+                        </a>
+                    </div>
                 </li>
             </ul>
         </section>
+
 
     </div>
     <section id="projectDetails" class="project-details hidden">

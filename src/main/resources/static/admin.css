@@ -146,6 +146,18 @@ section > form {
     padding-top: 0.7rem;
 }
 
+.result-svg {
+    width: 24px; /* Ajusta el tamaño del SVG */
+    height: 24px;
+    cursor: pointer;
+}
+
+.result-button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
 .project-details {
     width: 100%;
 }
