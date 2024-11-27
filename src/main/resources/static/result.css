@@ -158,7 +158,7 @@ thead {
 thead th {
     padding: var(--padding-1);
     text-align: left;
-    background-color: #4e4946;
+    color: #555555
 }
 
 tbody tr {
@@ -188,7 +188,7 @@ tbody td span:empty {
 
 button {
     background-color: transparent;
-    color: var(--color-primary);
+    color: #555555;
     padding: 10px 20px;
     font-size: 1rem;
     cursor: pointer;
