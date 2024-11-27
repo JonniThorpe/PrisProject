@@ -17,8 +17,13 @@
 
 <main>
     <section>
+        <!-- Popup para mensajes de error -->
+        <div id="errorPopup" class="hidden error-popup" th:if="${error}">
+            <p th:text="${error}"></p>
+            <button onclick="cerrarErrorPopup()">Cerrar</button>
+        </div>
+
         <h2>Cálculo del Resultado</h2>
-        <!-- Tareas dentro del límite -->
         <h3>Tareas dentro del presupuesto</h3>
         <table>
             <thead>
@@ -39,7 +44,6 @@
             </tbody>
         </table>
 
-        <!-- Tareas excedidas -->
         <h3>Tareas fuera del presupuesto</h3>
         <table>
             <thead>
@@ -68,7 +72,8 @@
     </section>
 </main>
 
-<div id="modalCambioTarea" class="hidden">
+<!-- Modal para cambiar tareas -->
+<div id="modalCambioTarea" class="hidden modal">
     <div class="modal-content">
         <h4>Cambiar tarea</h4>
         <p>Selecciona una tarea dentro del límite para reemplazar:</p>
@@ -85,6 +90,7 @@
         </form>
     </div>
 </div>
+
 <script th:src="@{/result.js}"></script>
 </body>
 </html>

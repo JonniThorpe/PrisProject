@@ -247,6 +247,47 @@ button:hover {
     justify-content: space-between;
 }
 
+/* Popup de error */
+.error-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FFCDD2; /* Rojo claro */
+    color: #B71C1C; /* Rojo oscuro */
+    padding: 15px 20px;
+    border: 1px solid #B71C1C;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 300px;
+    max-width: 600px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.error-popup button {
+    background: none;
+    border: none;
+    color: #B71C1C;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.2rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.show {
+    display: flex;
+}
+
+
 @keyframes scaleIn {
     from {
         transform: scale(0.9);
