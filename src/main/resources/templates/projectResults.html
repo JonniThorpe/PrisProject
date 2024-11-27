@@ -9,7 +9,6 @@
 </head>
 <body>
 <header>
-    <!-- Enlace con el SVG para regresar a /admin -->
     <a th:href="@{/admin}" class="back-button">
         <img th:src="@{/images/flecha.svg}" alt="Back" class="back-svg">
     </a>
@@ -19,29 +18,72 @@
 <main>
     <section>
         <h2>Cálculo del Resultado</h2>
+        <!-- Tareas dentro del límite -->
+        <h3>Tareas dentro del presupuesto</h3>
         <table>
             <thead>
             <tr>
                 <th>ID Tarea</th>
                 <th>Nombre Tarea</th>
-                <th>Esfuerzo</th> <!-- Nueva columna para esfuerzo -->
+                <th>Esfuerzo</th>
                 <th>Valoración Ponderada</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="resultado : ${resultados}">
-                <td th:text="${resultado.idTarea}"></td>
-                <td th:text="${resultado.nombreTarea}"></td>
-                <td th:text="${resultado.esfuerzo}"></td> <!-- Mostrar esfuerzo -->
+            <tr th:each="tarea : ${tareasDentroDelLimite}">
+                <td th:text="${tarea.idTarea}"></td>
+                <td th:text="${tarea.nombreTarea}"></td>
+                <td th:text="${tarea.esfuerzo}"></td>
+                <td th:text="${tarea.valoracionPonderada}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Tareas excedidas -->
+        <h3>Tareas fuera del presupuesto</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID Tarea</th>
+                <th>Nombre Tarea</th>
+                <th>Esfuerzo</th>
+                <th>Valoración Ponderada</th>
+                <th>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tareaExcedida : ${tareasExcedidas}">
+                <td th:text="${tareaExcedida.idTarea}"></td>
+                <td th:text="${tareaExcedida.nombreTarea}"></td>
+                <td th:text="${tareaExcedida.esfuerzo}"></td>
+                <td th:text="${tareaExcedida.valoracionPonderada}"></td>
                 <td>
-                    <span th:if="${resultado.valoracionPonderada != null}" th:text="${resultado.valoracionPonderada}"></span>
-                    <span th:if="${resultado.valoracionPonderada == null}">Sin valoración</span>
+                    <button th:onclick="'javascript:mostrarCambioTarea(' + ${tareaExcedida.idTarea} + ')'" class="btn btn-primary">
+                        Mover al límite
+                    </button>
                 </td>
             </tr>
             </tbody>
-
         </table>
     </section>
 </main>
+
+<div id="modalCambioTarea" class="hidden">
+    <div class="modal-content">
+        <h4>Cambiar tarea</h4>
+        <p>Selecciona una tarea dentro del límite para reemplazar:</p>
+        <form th:action="@{/admin/cambiarTarea}" method="post">
+            <input type="hidden" id="idTareaExcedida" name="idTareaExcedida">
+            <select name="idTareaDentro" id="idTareaDentro" required>
+                <option th:each="tarea : ${tareasDentroDelLimite}" th:value="${tarea.idTarea}" th:text="${tarea.nombreTarea}"></option>
+            </select>
+            <div class="modal-buttons">
+                <button type="submit" class="btn btn-success">Confirmar</button>
+                <button type="button" class="btn btn-danger" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script th:src="@{/result.js}"></script>
 </body>
 </html>
