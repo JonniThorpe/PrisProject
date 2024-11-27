@@ -147,12 +147,17 @@ public class AdminController {
         return "projectResults";
     }
 
-
     @PostMapping("/admin/cambiarTarea")
-    public String cambiarTarea(@RequestParam("idTareaExcedida") Long idTareaExcedida,
-                               @RequestParam("idTareaDentro") Long idTareaDentro,
-                               @RequestParam("idProyecto") Long idProyecto,
-                               Model model) {
+    public String cambiarTarea(
+            @RequestParam("idTareaExcedida") Long idTareaExcedida,
+            @RequestParam("idTareaDentro") Long idTareaDentro,
+            @RequestParam("idProyecto") Long idProyecto,
+            Model model) {
+
+        if (idTareaExcedida == null || idTareaDentro == null || idProyecto == null) {
+            model.addAttribute("error", "Faltan parámetros requeridos.");
+            return "redirect:/admin";
+        }
 
         Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
         if (proyectoOpt.isEmpty()) {
@@ -162,12 +167,14 @@ public class AdminController {
         Proyecto proyecto = proyectoOpt.get();
         double pesoMaximo = proyecto.getPesoMaximoTareas();
 
+        // Obtener las tareas del proyecto ordenadas por valoración ponderada
         List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
 
         List<ResultadoTareaDTO> tareasDentroDelLimite = new ArrayList<>();
         List<ResultadoTareaDTO> tareasExcedidas = new ArrayList<>();
         double esfuerzoAcumulado = 0;
 
+        // Iterar por las tareas y clasificarlas
         for (Object[] resultado : resultados) {
             Long idTarea = ((Number) resultado[0]).longValue();
             String nombreTarea = (String) resultado[1];
@@ -176,10 +183,11 @@ public class AdminController {
 
             ResultadoTareaDTO tarea = new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada);
 
-            tareasDentroDelLimite.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
-            tareasExcedidas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
-
-            if (idTarea.equals(idTareaExcedida)) {
+            if (idTarea.equals(idTareaDentro)) {
+                // Sacar del límite la tarea seleccionada para ser reemplazada
+                esfuerzoAcumulado -= tarea.getEsfuerzo();
+                tareasExcedidas.add(tarea);
+            } else if (idTarea.equals(idTareaExcedida)) {
                 // Insertar tarea excedida dentro del límite
                 if (esfuerzoAcumulado + tarea.getEsfuerzo() <= pesoMaximo) {
                     esfuerzoAcumulado += tarea.getEsfuerzo();
@@ -187,10 +195,6 @@ public class AdminController {
                 } else {
                     tareasExcedidas.add(tarea);
                 }
-            } else if (idTarea.equals(idTareaDentro)) {
-                // Sacar tarea dentro del límite
-                esfuerzoAcumulado -= tarea.getEsfuerzo();
-                tareasExcedidas.add(tarea);
             } else if (esfuerzoAcumulado + tarea.getEsfuerzo() <= pesoMaximo) {
                 esfuerzoAcumulado += tarea.getEsfuerzo();
                 tareasDentroDelLimite.add(tarea);
@@ -199,10 +203,11 @@ public class AdminController {
             }
         }
 
+        // Ordenar ambas listas por valoración ponderada descendente
         tareasDentroDelLimite.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
         tareasExcedidas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
-
+        // Actualizar el modelo con las nuevas listas de tareas
         model.addAttribute("proyecto", proyecto);
         model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         model.addAttribute("tareasExcedidas", tareasExcedidas);

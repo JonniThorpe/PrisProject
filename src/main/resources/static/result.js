@@ -1,16 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
     const modalCambioTarea = document.getElementById("modalCambioTarea");
     const idTareaExcedidaInput = document.getElementById("idTareaExcedida");
+    const idProyectoInput = document.getElementById("idProyecto");
 
     // Función para mostrar el modal
-    window.mostrarCambioTarea = function (idTareaExcedida) {
-        if (!idTareaExcedida) {
-            console.error("ID de tarea excedida no proporcionado.");
+    window.mostrarCambioTarea = function (idTareaExcedida, idProyecto) {
+        if (!idTareaExcedida || !idProyecto) {
+            console.error("ID de tarea excedida o proyecto no proporcionado.");
             return;
         }
 
-        // Establece el ID de la tarea excedida en el campo oculto
+        // Establece los IDs en los campos ocultos
         idTareaExcedidaInput.value = idTareaExcedida;
+        idProyectoInput.value = idProyecto;
 
         // Cambia el estado del modal a visible
         modalCambioTarea.classList.remove("hidden");

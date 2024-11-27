@@ -58,7 +58,7 @@
                 <td th:text="${tareaExcedida.esfuerzo}"></td>
                 <td th:text="${tareaExcedida.valoracionPonderada}"></td>
                 <td>
-                    <button th:onclick="'javascript:mostrarCambioTarea(' + ${tareaExcedida.idTarea} + ')'" class="btn btn-primary">
+                    <button th:onclick="'javascript:mostrarCambioTarea(' + ${tareaExcedida.idTarea} + ',' + ${proyecto.id} + ')'" class="btn btn-primary">
                         Mover al límite
                     </button>
                 </td>
@@ -74,6 +74,7 @@
         <p>Selecciona una tarea dentro del límite para reemplazar:</p>
         <form th:action="@{/admin/cambiarTarea}" method="post">
             <input type="hidden" id="idTareaExcedida" name="idTareaExcedida">
+            <input type="hidden" id="idProyecto" name="idProyecto" th:value="${proyecto.id}">
             <select name="idTareaDentro" id="idTareaDentro" required>
                 <option th:each="tarea : ${tareasDentroDelLimite}" th:value="${tarea.idTarea}" th:text="${tarea.nombreTarea}"></option>
             </select>
