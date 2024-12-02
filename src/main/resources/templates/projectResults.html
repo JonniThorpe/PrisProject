@@ -75,8 +75,12 @@
         </table>
 
     </section>
-    <button th:onclick="'javascript:mostrarModalContribucion()'" class="btn btn-outside">Ver Contribución</button>
-</main>
+    <form th:action="@{/admin/verContribucion}" method="get" style="display:inline;">
+        <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
+        <button type="submit" th:onclick="'javascript:mostrarModalContribucion()'" class="btn btn-outside">
+            Ver Contribución
+        </button>
+    </form></main>
 
 <!-- Modal para ver contribuciones -->
 <!-- Modal para ver contribuciones -->
