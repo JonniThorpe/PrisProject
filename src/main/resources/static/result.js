@@ -50,4 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
             cerrarErrorPopup();
         }, 5000);
     }
+    const modalVerContribucion = document.getElementById("modalVerContribucion");
+    const modalOverlay = document.getElementById("modalOverlay");
+
+    window.mostrarModalContribucion = function () {
+        modalVerContribucion.classList.add("show");
+        modalOverlay.classList.add("show");
+    };
+
+    window.cerrarModalContribucion = function () {
+        modalVerContribucion.classList.remove("show");
+        modalOverlay.classList.remove("show");
+    };
+
+    // Cerrar el modal si se hace clic en la superposición
+    modalOverlay.addEventListener("click", cerrarModalContribucion);
 });
+

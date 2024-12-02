@@ -32,11 +32,11 @@ public class ResultadoTareaDTO {
     }
 
     public Integer getEsfuerzo() {
-        return esfuerzo; // Getter para esfuerzo
+        return esfuerzo;
     }
 
     public void setEsfuerzo(Integer esfuerzo) {
-        this.esfuerzo = esfuerzo; // Setter para esfuerzo
+        this.esfuerzo = esfuerzo;
     }
 
     public Double getValoracionPonderada() {
@@ -45,5 +45,10 @@ public class ResultadoTareaDTO {
 
     public void setValoracionPonderada(Double valoracionPonderada) {
         this.valoracionPonderada = valoracionPonderada;
+    }
+
+    // Calcular productividad
+    public Double getProductividad() {
+        return esfuerzo != null && esfuerzo > 0 ? valoracionPonderada / esfuerzo : 0.0;
     }
 }

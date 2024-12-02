@@ -31,7 +31,8 @@
                 <th>ID Tarea</th>
                 <th>Nombre Tarea</th>
                 <th>Esfuerzo</th>
-                <th>Valoración Ponderada</th>
+                <th>Satisfacción</th>
+                <th>Productividad</th> <!-- Nueva columna -->
             </tr>
             </thead>
             <tbody>
@@ -40,6 +41,7 @@
                 <td th:text="${tarea.nombreTarea}"></td>
                 <td th:text="${tarea.esfuerzo}"></td>
                 <td th:text="${tarea.valoracionPonderada}"></td>
+                <td th:text="${tarea.productividad}"></td> <!-- Mostrar productividad -->
             </tr>
             </tbody>
         </table>
@@ -51,7 +53,8 @@
                 <th>ID Tarea</th>
                 <th>Nombre Tarea</th>
                 <th>Esfuerzo</th>
-                <th>Valoración Ponderada</th>
+                <th>Satisfacción</th>
+                <th>Productividad</th> <!-- Nueva columna -->
                 <th>Acción</th>
             </tr>
             </thead>
@@ -61,6 +64,7 @@
                 <td th:text="${tareaExcedida.nombreTarea}"></td>
                 <td th:text="${tareaExcedida.esfuerzo}"></td>
                 <td th:text="${tareaExcedida.valoracionPonderada}"></td>
+                <td th:text="${tareaExcedida.productividad}"></td> <!-- Mostrar productividad -->
                 <td>
                     <button th:onclick="'javascript:mostrarCambioTarea(' + ${tareaExcedida.idTarea} + ',' + ${proyecto.id} + ')'" class="btn btn-primary">
                         Mover al límite
@@ -69,8 +73,37 @@
             </tr>
             </tbody>
         </table>
+
     </section>
+    <button th:onclick="'javascript:mostrarModalContribucion()'" class="btn btn-outside">Ver Contribución</button>
 </main>
+
+<!-- Modal para ver contribuciones -->
+<!-- Modal para ver contribuciones -->
+<div id="modalVerContribucion" class="modal hidden">
+    <div class="modal-content">
+        <h4>Contribuciones de los Clientes</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Tarea</th>
+                <th>Contribución</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="contribucion : ${contribuciones}">
+                <td th:text="${contribucion['cliente']}"></td>
+                <td th:text="${contribucion['tarea']}"></td>
+                <td th:text="${#numbers.formatDecimal(contribucion['contribucion'], 2, 'COMMA')}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-danger" onclick="cerrarModalContribucion()">Cerrar</button>
+    </div>
+</div>
+<div id="modalOverlay" class="modal-overlay hidden"></div>
+
 
 <!-- Modal para cambiar tareas -->
 <div id="modalCambioTarea" class="hidden modal">
@@ -90,6 +123,7 @@
         </form>
     </div>
 </div>
+
 
 <script th:src="@{/result.js}"></script>
 </body>

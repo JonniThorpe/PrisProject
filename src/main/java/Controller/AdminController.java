@@ -204,7 +204,6 @@ public class AdminController {
                 .orElse(null);
 
         if (tareaExcedida == null || tareaDentro == null) {
-            model.addAttribute("error", "No se encontraron las tareas seleccionadas.");
         } else {
             // Verificar si la tarea excedida puede reemplazar a la tarea dentro sin exceder el esfuerzo máximo
             double esfuerzoNuevo = esfuerzoAcumulado - tareaDentro.getEsfuerzo() + tareaExcedida.getEsfuerzo();
@@ -233,6 +232,56 @@ public class AdminController {
         return "projectResults";
     }
 
+    @GetMapping("/admin/verContribucion")
+    public String verContribucion(
+            @RequestParam("idProyecto") Long idProyecto,
+            Model model) {
+        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
+
+        if (proyectoOpt.isEmpty()) {
+            model.addAttribute("error", "El proyecto no existe.");
+            return "redirect:/admin";
+        }
+
+        Proyecto proyecto = proyectoOpt.get();
+
+        // Obtener tareas y sus valoraciones ponderadas
+        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+
+        List<Map<String, Object>> contribuciones = new ArrayList<>();
+
+        for (Object[] resultado : resultados) {
+            Long idTarea = ((Number) resultado[0]).longValue();
+            String nombreTarea = (String) resultado[1];
+            Integer esfuerzo = ((Number) resultado[2]).intValue();
+            Double valoracionPonderadaTotal = ((Number) resultado[3]).doubleValue();
+
+            List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
+
+            for (ProyectoHasUsuario phu : clientesProyecto) {
+                Usuario cliente = phu.getUsuarioIdusuario();
+                Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(cliente.getId().longValue(), idTarea);
+
+                if (valoracionOpt.isPresent()) {
+                    UsuarioValoraTarea valoracion = valoracionOpt.get();
+                    double contribucion = (phu.getPesoCliente() * valoracion.getValoracion()) / valoracionPonderadaTotal;
+
+                    Map<String, Object> contribucionData = new HashMap<>();
+                    contribucionData.put("cliente", cliente.getNombre());
+                    contribucionData.put("tarea", nombreTarea);
+                    contribucionData.put("contribucion", contribucion);
+
+                    contribuciones.add(contribucionData);
+                }
+            }
+        }
+
+        System.out.println("Contribuciones generadas:");
+        contribuciones.forEach(System.out::println); // Imprime el contenido de las contribuciones para depuración.
+
+        model.addAttribute("contribuciones", contribuciones);
+        return "projectResults";
+    }
 
     @PostMapping("/admin/updateBudget")
     public String updateBudget(@RequestParam("idProyecto") Integer idProyecto,

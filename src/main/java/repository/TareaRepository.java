@@ -2,12 +2,14 @@ package repository;
 
 import entidades.Proyecto;
 import entidades.Tarea;
+import entidades.UsuarioValoraTarea;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**public interface TareaRepository extends CrudRepository<Tarea, Integer> {
     @Query("SELECT t.id, t.nombre AS nombreTarea, "
@@ -55,6 +57,15 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
             @Param("idProyecto") Long idProyecto,
             @Param("rolCliente") String rolCliente
     );
-
+    @Query(
+            "SELECT uvt " +
+                    "FROM UsuarioValoraTarea uvt " +
+                    "WHERE uvt.usuarioIdusuario.id = :idCliente " +
+                    "  AND uvt.tareaIdtarea.id = :idTarea"
+    )
+    Optional<UsuarioValoraTarea> findValoracionByClienteAndTarea(
+            @Param("idCliente") Long idCliente,
+            @Param("idTarea") Long idTarea
+    );
 }
 
