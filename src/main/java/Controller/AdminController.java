@@ -105,16 +105,14 @@ public class AdminController {
         }
 
         Proyecto proyecto = proyectoOpt.get();
-
-        // Obtener los resultados del cálculo para este proyecto
-        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
-
-        List<ResultadoTareaDTO> tareasDentroDelLimite = new ArrayList<>();
-        List<ResultadoTareaDTO> tareasExcedidas = new ArrayList<>();
-        double esfuerzoAcumulado = 0;
         double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Convertir los resultados a DTO y ordenar por valoración ponderada descendente
+        // Obtener las tareas y valoraciones ponderadas
+        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+        List<ResultadoTareaDTO> tareasDentroDelLimite = new ArrayList<>();
+        List<ResultadoTareaDTO> tareasExcedidas = new ArrayList<>();
+
+        // Convertir los resultados a DTO
         List<ResultadoTareaDTO> todasLasTareas = new ArrayList<>();
         for (Object[] resultado : resultados) {
             Long idTarea = ((Number) resultado[0]).longValue();
@@ -125,10 +123,11 @@ public class AdminController {
             todasLasTareas.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
         }
 
-        // Ordenar todas las tareas por valoración ponderada (descendente)
+        // Ordenar por valoración ponderada (descendente)
         todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
-        // Clasificar las tareas en dentro del límite o excedidas
+        // Aplicar lógica de mochila
+        double esfuerzoAcumulado = 0;
         for (ResultadoTareaDTO tarea : todasLasTareas) {
             if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
                 esfuerzoAcumulado += tarea.getEsfuerzo();
@@ -138,149 +137,148 @@ public class AdminController {
             }
         }
 
+        // Obtener contribuciones para las tareas incluidas
+        List<Map<String, Object>> contribuciones = calcularContribuciones(proyecto, tareasDentroDelLimite);
+
+        session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+        session.setAttribute("tareasExcedidas", tareasExcedidas);
+
         // Añadir los resultados al modelo
         model.addAttribute("proyecto", proyecto);
         model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         model.addAttribute("tareasExcedidas", tareasExcedidas);
         model.addAttribute("esfuerzoMaximo", esfuerzoMaximo);
+        model.addAttribute("contribuciones", contribuciones);
 
         return "projectResults";
     }
 
-    @PostMapping("/admin/cambiarTarea")
-    public String cambiarTarea(
-            @RequestParam("idTareaExcedida") Long idTareaExcedida,
-            @RequestParam("idTareaDentro") Long idTareaDentro,
+    @PostMapping("/admin/expulsarTarea")
+    public String expulsarTarea(
+            @RequestParam("idTarea") Long idTarea,
             @RequestParam("idProyecto") Long idProyecto,
+            HttpSession session,
             Model model) {
 
-        if (idTareaExcedida == null || idTareaDentro == null || idProyecto == null) {
-            model.addAttribute("error", "Faltan parámetros requeridos.");
-            return "projectResults";
-        }
+        System.out.println("Expulsar tarea iniciada para tarea ID: " + idTarea + " en proyecto ID: " + idProyecto);
 
         Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
         if (proyectoOpt.isEmpty()) {
+            System.out.println("Error: Proyecto no encontrado.");
             model.addAttribute("error", "El proyecto especificado no existe.");
-            return "projectResults";
+            return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
         Proyecto proyecto = proyectoOpt.get();
-        double pesoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Obtener todas las tareas ordenadas por valoración ponderada
-        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
+        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
-        List<ResultadoTareaDTO> tareasDentroDelLimite = new ArrayList<>();
-        List<ResultadoTareaDTO> tareasExcedidas = new ArrayList<>();
-        double esfuerzoAcumulado = 0;
-
-        // Clasificar tareas dentro y fuera del límite
-        for (Object[] resultado : resultados) {
-            Long idTarea = ((Number) resultado[0]).longValue();
-            String nombreTarea = (String) resultado[1];
-            Integer esfuerzo = ((Number) resultado[2]).intValue();
-            Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
-
-            ResultadoTareaDTO tarea = new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada);
-
-            if (esfuerzoAcumulado + tarea.getEsfuerzo() <= pesoMaximo) {
-                esfuerzoAcumulado += tarea.getEsfuerzo();
-                tareasDentroDelLimite.add(tarea);
-            } else {
-                tareasExcedidas.add(tarea);
-            }
+        if (tareasDentroDelLimite == null || tareasExcedidas == null) {
+            System.out.println("Error: Listas de tareas no inicializadas.");
+            return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
-        // Encontrar las tareas seleccionadas
-        ResultadoTareaDTO tareaExcedida = tareasExcedidas.stream()
-                .filter(t -> t.getIdTarea().equals(idTareaExcedida))
+        System.out.println("Tareas dentro del límite antes de expulsar: " + tareasDentroDelLimite);
+        System.out.println("Tareas excedidas antes de expulsar: " + tareasExcedidas);
+
+        ResultadoTareaDTO tareaAExpulsar = tareasDentroDelLimite.stream()
+                .filter(t -> t.getIdTarea().equals(idTarea))
                 .findFirst()
                 .orElse(null);
 
-        ResultadoTareaDTO tareaDentro = tareasDentroDelLimite.stream()
-                .filter(t -> t.getIdTarea().equals(idTareaDentro))
-                .findFirst()
-                .orElse(null);
-
-        if (tareaExcedida == null || tareaDentro == null) {
+        if (tareaAExpulsar != null) {
+            tareasDentroDelLimite.remove(tareaAExpulsar);
+            tareasExcedidas.add(tareaAExpulsar);
+            System.out.println("Tarea expulsada: " + tareaAExpulsar);
         } else {
-            // Verificar si la tarea excedida puede reemplazar a la tarea dentro sin exceder el esfuerzo máximo
-            double esfuerzoNuevo = esfuerzoAcumulado - tareaDentro.getEsfuerzo() + tareaExcedida.getEsfuerzo();
-            if (esfuerzoNuevo > pesoMaximo) {
-                model.addAttribute("error", "No se puede mover la tarea seleccionada porque excede el esfuerzo máximo permitido.");
-            } else {
-                // Realizar el intercambio
-                tareasDentroDelLimite.remove(tareaDentro);
-                tareasDentroDelLimite.add(tareaExcedida);
-
-                tareasExcedidas.remove(tareaExcedida);
-                tareasExcedidas.add(tareaDentro);
-            }
+            System.out.println("Error: Tarea no encontrada en la lista dentro del límite.");
         }
 
-        // Ordenar ambas listas por valoración ponderada descendente
-        tareasDentroDelLimite.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
-        tareasExcedidas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
+        System.out.println("Tareas dentro del límite después de expulsar: " + tareasDentroDelLimite);
+        System.out.println("Tareas excedidas después de expulsar: " + tareasExcedidas);
 
-        // Actualizar el modelo con las listas de tareas actualizadas
-        model.addAttribute("proyecto", proyecto);
         model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         model.addAttribute("tareasExcedidas", tareasExcedidas);
-        model.addAttribute("esfuerzoMaximo", pesoMaximo);
 
-        return "projectResults";
+        session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+        session.setAttribute("tareasExcedidas", tareasExcedidas);
+
+
+        return mostrarResultadoProyecto(idProyecto, session, model);
     }
 
-    @GetMapping("/admin/verContribucion")
-    public String verContribucion(
+    @PostMapping("/admin/forzarEntrada")
+    public String forzarEntrada(
+            @RequestParam("idTarea") Long idTarea,
             @RequestParam("idProyecto") Long idProyecto,
+            HttpSession session,
             Model model) {
-        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
 
+        System.out.println("Forzar entrada iniciada para tarea ID: " + idTarea + " en proyecto ID: " + idProyecto);
+
+        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
         if (proyectoOpt.isEmpty()) {
-            model.addAttribute("error", "El proyecto no existe.");
-            return "redirect:/admin";
+            System.out.println("Error: Proyecto no encontrado.");
+            model.addAttribute("error", "El proyecto especificado no existe.");
+            return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
         Proyecto proyecto = proyectoOpt.get();
+        double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Obtener tareas y sus valoraciones ponderadas
-        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
+        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
-        List<Map<String, Object>> contribuciones = new ArrayList<>();
-
-        for (Object[] resultado : resultados) {
-            Long idTarea = ((Number) resultado[0]).longValue();
-            String nombreTarea = (String) resultado[1];
-            Integer esfuerzo = ((Number) resultado[2]).intValue();
-            Double valoracionPonderadaTotal = ((Number) resultado[3]).doubleValue();
-
-            List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
-
-            for (ProyectoHasUsuario phu : clientesProyecto) {
-                Usuario cliente = phu.getUsuarioIdusuario();
-                Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(cliente.getId().longValue(), idTarea);
-
-                if (valoracionOpt.isPresent()) {
-                    UsuarioValoraTarea valoracion = valoracionOpt.get();
-                    double contribucion = (phu.getPesoCliente() * valoracion.getValoracion()) / valoracionPonderadaTotal;
-
-                    Map<String, Object> contribucionData = new HashMap<>();
-                    contribucionData.put("cliente", cliente.getNombre());
-                    contribucionData.put("tarea", nombreTarea);
-                    contribucionData.put("contribucion", contribucion);
-
-                    contribuciones.add(contribucionData);
-                }
-            }
+        if (tareasDentroDelLimite == null || tareasExcedidas == null) {
+            System.out.println("Error: Listas de tareas no inicializadas.");
+            return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
-        System.out.println("Contribuciones generadas:");
-        contribuciones.forEach(System.out::println); // Imprime el contenido de las contribuciones para depuración.
+        double esfuerzoAcumulado = tareasDentroDelLimite.stream()
+                .mapToDouble(ResultadoTareaDTO::getEsfuerzo)
+                .sum();
 
-        model.addAttribute("contribuciones", contribuciones);
-        return "projectResults";
+        System.out.println("Esfuerzo acumulado actual: " + esfuerzoAcumulado);
+        System.out.println("Tareas dentro del límite antes de forzar: " + tareasDentroDelLimite);
+        System.out.println("Tareas excedidas antes de forzar: " + tareasExcedidas);
+
+        ResultadoTareaDTO tareaAForzar = tareasExcedidas.stream()
+                .filter(t -> t.getIdTarea().equals(idTarea))
+                .findFirst()
+                .orElse(null);
+
+        if (tareaAForzar != null) {
+            if (esfuerzoAcumulado + tareaAForzar.getEsfuerzo() > esfuerzoMaximo) {
+                System.out.println("Error: Esfuerzo excede el límite máximo permitido.");
+                model.addAttribute("error", "No se puede forzar la entrada de la tarea porque excede el esfuerzo máximo permitido.");
+            } else {
+                tareasExcedidas.remove(tareaAForzar);
+                tareasDentroDelLimite.add(tareaAForzar);
+                System.out.println("Tarea forzada a entrar: " + tareaAForzar);
+            }
+        } else {
+            System.out.println("Error: Tarea no encontrada en la lista excedida.");
+        }
+
+        System.out.println("Tareas dentro del límite después de forzar: " + tareasDentroDelLimite);
+        System.out.println("Tareas excedidas después de forzar: " + tareasExcedidas);
+
+        model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+        model.addAttribute("tareasExcedidas", tareasExcedidas);
+
+        session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+        session.setAttribute("tareasExcedidas", tareasExcedidas);
+
+
+        return mostrarResultadoProyecto(idProyecto, session, model);
+    }
+
+    @PostMapping("/admin/resetCambios")
+    public String resetCambios(@RequestParam("idProyecto") Long idProyecto, HttpSession session) {
+        session.removeAttribute("tareasExpulsadas");
+        session.removeAttribute("tareasForzadas");
+        return "redirect:/admin/result?idProyecto=" + idProyecto;
     }
 
     @PostMapping("/admin/updateBudget")
@@ -452,4 +450,33 @@ public class AdminController {
         model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito con el peso especificado.");
         return "redirect:/admin";
     }
+
+    private List<Map<String, Object>> calcularContribuciones(Proyecto proyecto, List<ResultadoTareaDTO> tareasDentroDelLimite) {
+        List<Map<String, Object>> contribuciones = new ArrayList<>();
+
+        for (ResultadoTareaDTO tarea : tareasDentroDelLimite) {
+            Long idTarea = tarea.getIdTarea();
+            List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
+
+            for (ProyectoHasUsuario phu : clientesProyecto) {
+                Usuario cliente = phu.getUsuarioIdusuario();
+                Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(cliente.getId().longValue(), idTarea);
+
+                if (valoracionOpt.isPresent()) {
+                    UsuarioValoraTarea valoracion = valoracionOpt.get();
+                    double contribucion = (phu.getPesoCliente() * valoracion.getValoracion()) / tarea.getValoracionPonderada();
+
+                    Map<String, Object> contribucionData = new HashMap<>();
+                    contribucionData.put("cliente", cliente.getNombre());
+                    contribucionData.put("tarea", tarea.getNombreTarea());
+                    contribucionData.put("contribucion", contribucion);
+
+                    contribuciones.add(contribucionData);
+                }
+            }
+        }
+
+        return contribuciones;
+    }
+
 }

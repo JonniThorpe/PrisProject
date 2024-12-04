@@ -17,7 +17,6 @@
 
 <main>
     <section>
-        <!-- Popup para mensajes de error -->
         <div id="errorPopup" class="hidden error-popup" th:if="${error}">
             <p th:text="${error}"></p>
             <button onclick="cerrarErrorPopup()">Cerrar</button>
@@ -32,7 +31,8 @@
                 <th>Nombre Tarea</th>
                 <th>Esfuerzo</th>
                 <th>Satisfacción</th>
-                <th>Productividad</th> <!-- Nueva columna -->
+                <th>Productividad</th>
+                <th>Acción</th>
             </tr>
             </thead>
             <tbody>
@@ -41,7 +41,14 @@
                 <td th:text="${tarea.nombreTarea}"></td>
                 <td th:text="${tarea.esfuerzo}"></td>
                 <td th:text="${tarea.valoracionPonderada}"></td>
-                <td th:text="${tarea.productividad}"></td> <!-- Mostrar productividad -->
+                <td th:text="${tarea.productividad}"></td>
+                <td>
+                    <form th:action="@{/admin/expulsarTarea}" method="post">
+                        <input type="hidden" name="idTarea" th:value="${tarea.idTarea}">
+                        <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
+                        <button type="submit" class="btn btn-danger">Expulsar</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -54,7 +61,7 @@
                 <th>Nombre Tarea</th>
                 <th>Esfuerzo</th>
                 <th>Satisfacción</th>
-                <th>Productividad</th> <!-- Nueva columna -->
+                <th>Productividad</th>
                 <th>Acción</th>
             </tr>
             </thead>
@@ -64,26 +71,32 @@
                 <td th:text="${tareaExcedida.nombreTarea}"></td>
                 <td th:text="${tareaExcedida.esfuerzo}"></td>
                 <td th:text="${tareaExcedida.valoracionPonderada}"></td>
-                <td th:text="${tareaExcedida.productividad}"></td> <!-- Mostrar productividad -->
+                <td th:text="${tareaExcedida.productividad}"></td>
                 <td>
-                    <button th:onclick="'javascript:mostrarCambioTarea(' + ${tareaExcedida.idTarea} + ',' + ${proyecto.id} + ')'" class="btn btn-primary">
-                        Mover al límite
-                    </button>
+                    <form th:action="@{/admin/forzarEntrada}" method="post">
+                        <input type="hidden" name="idTarea" th:value="${tareaExcedida.idTarea}">
+                        <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
+                        <button type="submit" class="btn btn-success">Forzar entrada</button>
+                    </form>
                 </td>
             </tr>
             </tbody>
         </table>
 
     </section>
-    <form th:action="@{/admin/verContribucion}" method="get" style="display:inline;">
-        <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
+
         <button type="submit" th:onclick="'javascript:mostrarModalContribucion()'" class="btn btn-outside">
             Ver Contribución
         </button>
-    </form></main>
 
-<!-- Modal para ver contribuciones -->
-<!-- Modal para ver contribuciones -->
+    <form th:action="@{/admin/resetCambios}" method="post" style="display:inline;">
+        <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
+        <button type="submit" class="btn btn-warning">Reiniciar Cambios</button>
+    </form>
+
+</main>
+
+
 <div id="modalVerContribucion" class="modal hidden">
     <div class="modal-content">
         <h4>Contribuciones de los Clientes</h4>
@@ -99,7 +112,7 @@
             <tr th:each="contribucion : ${contribuciones}">
                 <td th:text="${contribucion['cliente']}"></td>
                 <td th:text="${contribucion['tarea']}"></td>
-                <td th:text="${#numbers.formatDecimal(contribucion['contribucion'], 2, 'COMMA')}"></td>
+                <td th:text="${contribucion['contribucion']}"></td>
             </tr>
             </tbody>
         </table>
@@ -109,7 +122,6 @@
 <div id="modalOverlay" class="modal-overlay hidden"></div>
 
 
-<!-- Modal para cambiar tareas -->
 <div id="modalCambioTarea" class="hidden modal">
     <div class="modal-content">
         <h4>Cambiar tarea</h4>
