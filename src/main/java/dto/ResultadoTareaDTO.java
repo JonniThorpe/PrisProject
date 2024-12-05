@@ -1,10 +1,13 @@
 package dto;
 
+import java.util.List;
+
 public class ResultadoTareaDTO {
     private Long idTarea;
     private String nombreTarea;
     private Integer esfuerzo; // Añadir esta propiedad
     private Double valoracionPonderada;
+    private List<Long> dependencias; // IDs de las tareas de las que depende esta tarea
 
     // Constructor
     public ResultadoTareaDTO(Long idTarea, String nombreTarea, Integer esfuerzo, Double valoracionPonderada) {

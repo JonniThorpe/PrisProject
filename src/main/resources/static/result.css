@@ -69,6 +69,11 @@ h3 {
     padding-top: 10px;
 }
 
+a {
+    color: #555555;
+    text-decoration: none;
+}
+
 /* Resto del formulario y layout */
 main {
     display: flex;
@@ -247,6 +252,18 @@ button:hover {
      align-items: center;
      z-index: 9999; /* Asegura que el modal esté encima */
  }
+
+#modalDependenciasGrafo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que el modal esté encima */
+}
 
 .modal {
     display: flex;

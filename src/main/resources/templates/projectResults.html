@@ -43,11 +43,16 @@
                 <td th:text="${tarea.valoracionPonderada}"></td>
                 <td th:text="${tarea.productividad}"></td>
                 <td>
-                    <form th:action="@{/admin/expulsarTarea}" method="post">
+                    <form th:action="@{/admin/expulsarTarea}" method="post" style="display: inline;">
                         <input type="hidden" name="idTarea" th:value="${tarea.idTarea}">
                         <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
                         <button type="submit" class="btn btn-danger">Expulsar</button>
                     </form>
+                    <button type="submit" class="btn btn-success">
+                        <a th:href="@{/admin/dependencias(idTarea=${tarea.idTarea})}" class="btn btn-secondary">
+                            Ver Dependencias
+                        </a>
+                    </button>
                 </td>
             </tr>
             </tbody>
@@ -73,16 +78,20 @@
                 <td th:text="${tareaExcedida.valoracionPonderada}"></td>
                 <td th:text="${tareaExcedida.productividad}"></td>
                 <td>
-                    <form th:action="@{/admin/forzarEntrada}" method="post">
+                    <form th:action="@{/admin/forzarEntrada}" method="post" style="display: inline;">
                         <input type="hidden" name="idTarea" th:value="${tareaExcedida.idTarea}">
                         <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
                         <button type="submit" class="btn btn-success">Forzar entrada</button>
                     </form>
+                    <button type="submit" class="btn btn-success">
+                    <a th:href="@{/admin/dependencias(idTarea=${tareaExcedida.idTarea})}" class="btn btn-secondary">
+                        Ver Dependencias
+                    </a>
+                    </button>
                 </td>
             </tr>
             </tbody>
         </table>
-
     </section>
 
     <button type="submit" onclick="javascript:mostrarModalContribucion()" class="btn btn-outside">
@@ -96,9 +105,14 @@
 
     <button type="submit" class="btn btn-outside" th:onclick="'javascript:mostrarModalGrafo()'">Ver Grafo</button>
 
+    <button type="button" class="btn btn-outside" onclick="mostrarModalDependenciasGrafo()">Ver Grafo de Dependencias</button>
+
 </main>
 
 <script type="application/json" id="tareasData" th:utext="${tareasJson}"></script>
+
+<script type="application/json" id="dependenciasData" th:utext="${grafoDependencias}"></script>
+
 
 <div id="modalVerContribucion" class="modal hidden">
     <div class="modal-content">
@@ -132,6 +146,16 @@
     </div>
 </div>
 <div id="modalOverlay2" class="modal-overlay hidden"></div>
+
+<!-- Modal para el grafo de dependencias -->
+<div id="modalDependenciasGrafo" class="modal hidden">
+    <div class="modal-content">
+        <h4>Grafo de Dependencias</h4>
+        <div id="dependenciasGrafoContainer" style="width: 100%; height: 400px;"></div>
+        <button class="btn btn-danger" onclick="cerrarModalDependenciasGrafo()">Cerrar</button>
+    </div>
+</div>
+<div id="modalDependenciasOverlay" class="modal-overlay hidden"></div>
 
 <script th:src="@{/result.js}"></script>
 </body>

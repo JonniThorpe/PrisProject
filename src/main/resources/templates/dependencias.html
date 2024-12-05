@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/result.css}" rel="stylesheet">
+    <title>Dependencias</title>
+</head>
+<body>
+<header>
+    <a th:href="@{'/admin/result?idProyecto=' + ${idProyecto}}" class="back-button">
+        <img th:src="@{/images/flecha.svg}" alt="Back" class="back-svg">
+    </a>
+    <h1>Dependencias de la Tarea: <span th:text="${tarea.nombre}"></span></h1>
+</header>
+
+<main>
+    <section>
+        <h2>Dependencias actuales</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Tarea dependiente</th>
+                <th>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dependencia : ${dependencias}">
+                <td th:text="${dependencia.idTareaDependencia.nombre}"></td>
+                <td>
+                    <form th:action="@{/admin/dependencias/eliminar}" method="post">
+                        <input type="hidden" name="idDependencia" th:value="${dependencia.id}">
+                        <input type="hidden" name="idTarea" th:value="${tarea.id}">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Añadir nueva dependencia</h2>
+        <form th:action="@{/admin/dependencias/agregar}" method="post">
+            <input type="hidden" name="idTarea" th:value="${tarea.id}">
+            <label for="idDependencia">Tarea de la que depende:</label>
+            <select id="idDependencia" name="idDependencia">
+                <option th:each="t : ${tareas}" th:value="${t.id}" th:text="${t.nombre}"></option>
+            </select>
+            <button type="submit">Añadir</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

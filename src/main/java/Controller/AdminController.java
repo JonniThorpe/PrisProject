@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import repository.ProyectoHasUsuarioRepository;
 import repository.ProyectoRepository;
 import repository.TareaRepository;
+import repository.DependenciaRepository;
 
 import repository.UsuarioRepository;
 
@@ -34,6 +35,9 @@ public class AdminController {
 
     @Autowired
     private ProyectoHasUsuarioRepository proyectoHasUsuarioRepository;
+
+    @Autowired
+    private DependenciaRepository dependenciaRepository;
 
     @GetMapping("/admin")
     public String mostrarPanelAdmin(HttpSession session, Model model) {
@@ -109,17 +113,15 @@ public class AdminController {
         Proyecto proyecto = proyectoOpt.get();
         double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Verificar si las listas ya existen en la sesión
+        // Obtener tareas
         List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
         List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
         if (tareasDentroDelLimite == null || tareasExcedidas == null) {
-            // Recalcular las listas desde cero si no están presentes en la sesión
             List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
             tareasDentroDelLimite = new ArrayList<>();
             tareasExcedidas = new ArrayList<>();
 
-            // Convertir los resultados a DTO
             List<ResultadoTareaDTO> todasLasTareas = new ArrayList<>();
             for (Object[] resultado : resultados) {
                 Long idTarea = ((Number) resultado[0]).longValue();
@@ -130,10 +132,8 @@ public class AdminController {
                 todasLasTareas.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
             }
 
-            // Ordenar por valoración ponderada (descendente)
             todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
-            // Aplicar lógica de mochila
             double esfuerzoAcumulado = 0;
             for (ResultadoTareaDTO tarea : todasLasTareas) {
                 if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
@@ -144,26 +144,30 @@ public class AdminController {
                 }
             }
 
-            // Guardar las listas en la sesión
             session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
             session.setAttribute("tareasExcedidas", tareasExcedidas);
         }
 
-        // Obtener contribuciones para las tareas incluidas
         List<Map<String, Object>> contribuciones = calcularContribuciones(proyecto, tareasDentroDelLimite);
 
-        // Convertir tareas dentro del límite a JSON
-        String tareasJson = "";
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            tareasJson = objectMapper.writeValueAsString(tareasDentroDelLimite);
-        } catch (JsonProcessingException e) {
-            System.err.println("Error al convertir tareas a JSON: " + e.getMessage());
-            tareasJson = "[]"; // Devolver un JSON vacío en caso de error
-        }
-        model.addAttribute("tareasJson", tareasJson);
+        // Grafo de dependencias
+        List<Map<String, Object>> grafoDependencias = new ArrayList<>();
+        List<Tarea> tareas = tareaRepository.findByProyectoIdproyecto(proyecto);
 
-        // Añadir los resultados al modelo
+        for (Tarea tarea : tareas) {
+            List<Dependencia> dependencias = dependenciaRepository.findByTarea(tarea);
+            for (Dependencia dependencia : dependencias) {
+                Map<String, Object> link = new HashMap<>();
+                link.put("from", tarea.getId());
+                link.put("fromName", tarea.getNombre());
+                link.put("to", dependencia.getIdTareaDependencia().getId());
+                link.put("toName", dependencia.getIdTareaDependencia().getNombre());
+                grafoDependencias.add(link);
+            }
+        }
+
+        model.addAttribute("tareasJson", convertirAJson(tareasDentroDelLimite));
+        model.addAttribute("grafoDependencias", convertirAJson(grafoDependencias));
         model.addAttribute("proyecto", proyecto);
         model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         model.addAttribute("tareasExcedidas", tareasExcedidas);
@@ -172,7 +176,6 @@ public class AdminController {
 
         return "projectResults";
     }
-
 
     @PostMapping("/admin/expulsarTarea")
     public String expulsarTarea(
@@ -460,6 +463,90 @@ public class AdminController {
         model.addAttribute("mensaje", "Clientes asignados al proyecto con éxito con el peso especificado.");
         return "redirect:/admin";
     }
+
+    @GetMapping("/admin/dependencias")
+    public String mostrarDependencias(@RequestParam("idTarea") Integer idTarea,
+                                      Model model,
+                                      HttpSession session) {
+        // Validar la sesión del usuario
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/login";
+        }
+
+        // Buscar la tarea por ID
+        Optional<Tarea> tareaOpt = tareaRepository.findById(idTarea);
+        if (tareaOpt.isEmpty()) {
+            model.addAttribute("error", "Tarea no encontrada.");
+            return "redirect:/admin";
+        }
+        Tarea tarea = tareaOpt.get();
+
+        // Obtener el proyecto asociado
+        Proyecto proyecto = tarea.getProyectoIdproyecto();
+        if (proyecto == null) {
+            model.addAttribute("error", "Proyecto asociado a la tarea no encontrado.");
+            return "redirect:/admin";
+        }
+
+        // Guardar idProyecto en el modelo
+        model.addAttribute("idProyecto", proyecto.getId().longValue());
+
+        // Obtener todas las dependencias actuales y las tareas disponibles
+        List<Dependencia> dependencias = dependenciaRepository.findByTarea(tarea);
+        List<Tarea> tareasDisponibles = tareaRepository.findByProyectoIdproyecto(proyecto);
+
+        // Excluir la propia tarea y tareas ya dependientes
+        tareasDisponibles.remove(tarea);
+        tareasDisponibles.removeAll(dependencias.stream().map(Dependencia::getIdTareaDependencia).toList());
+
+        // Agregar los datos al modelo
+        model.addAttribute("tarea", tarea);
+        model.addAttribute("dependencias", dependencias);
+        model.addAttribute("tareas", tareasDisponibles);
+
+        return "dependencias";
+    }
+
+
+    @PostMapping("/admin/dependencias/agregar")
+    public String agregarDependencia(@RequestParam("idTarea") Integer idTarea,
+                                     @RequestParam("idDependencia") Integer idDependencia,
+                                     Model model, HttpSession session) {
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/login";
+        }
+
+        // Validar que ambas tareas existen
+        Optional<Tarea> tareaOpt = tareaRepository.findById(idTarea);
+        Optional<Tarea> dependenciaOpt = tareaRepository.findById(idDependencia);
+
+        if (tareaOpt.isEmpty() || dependenciaOpt.isEmpty()) {
+            model.addAttribute("error", "Tarea o dependencia no encontrada.");
+            return "redirect:/admin";
+        }
+
+        Tarea tarea = tareaOpt.get();
+        Tarea dependencia = dependenciaOpt.get();
+
+        // Crear y guardar la nueva dependencia
+        Dependencia nuevaDependencia = new Dependencia();
+        nuevaDependencia.setIdTarea(tarea);
+        nuevaDependencia.setIdTareaDependencia(dependencia);
+
+        dependenciaRepository.save(nuevaDependencia);
+
+        return "redirect:/admin/dependencias?idTarea=" + idTarea;
+    }
+
+    @PostMapping("/admin/dependencias/eliminar")
+    public String eliminarDependencia(@RequestParam("idDependencia") Integer idDependencia,
+                                      @RequestParam("idTarea") Integer idTarea) {
+        dependenciaRepository.deleteById(idDependencia);
+        return "redirect:/admin/dependencias?idTarea=" + idTarea;
+    }
+
 
     private List<Map<String, Object>> calcularContribuciones(Proyecto proyecto, List<ResultadoTareaDTO> tareasDentroDelLimite) {
         List<Map<String, Object>> contribuciones = new ArrayList<>();

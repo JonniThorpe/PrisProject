@@ -67,5 +67,6 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
             @Param("idCliente") Long idCliente,
             @Param("idTarea") Long idTarea
     );
+
 }
 
