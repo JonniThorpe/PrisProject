@@ -1,5 +1,7 @@
 package Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.ResultadoTareaDTO;
 import dto.ValoracionDTO;
 import entidades.*;
@@ -107,41 +109,59 @@ public class AdminController {
         Proyecto proyecto = proyectoOpt.get();
         double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Obtener las tareas y valoraciones ponderadas
-        List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
-        List<ResultadoTareaDTO> tareasDentroDelLimite = new ArrayList<>();
-        List<ResultadoTareaDTO> tareasExcedidas = new ArrayList<>();
+        // Verificar si las listas ya existen en la sesión
+        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
+        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
-        // Convertir los resultados a DTO
-        List<ResultadoTareaDTO> todasLasTareas = new ArrayList<>();
-        for (Object[] resultado : resultados) {
-            Long idTarea = ((Number) resultado[0]).longValue();
-            String nombreTarea = (String) resultado[1];
-            Integer esfuerzo = ((Number) resultado[2]).intValue();
-            Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+        if (tareasDentroDelLimite == null || tareasExcedidas == null) {
+            // Recalcular las listas desde cero si no están presentes en la sesión
+            List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+            tareasDentroDelLimite = new ArrayList<>();
+            tareasExcedidas = new ArrayList<>();
 
-            todasLasTareas.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
-        }
+            // Convertir los resultados a DTO
+            List<ResultadoTareaDTO> todasLasTareas = new ArrayList<>();
+            for (Object[] resultado : resultados) {
+                Long idTarea = ((Number) resultado[0]).longValue();
+                String nombreTarea = (String) resultado[1];
+                Integer esfuerzo = ((Number) resultado[2]).intValue();
+                Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
 
-        // Ordenar por valoración ponderada (descendente)
-        todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
-
-        // Aplicar lógica de mochila
-        double esfuerzoAcumulado = 0;
-        for (ResultadoTareaDTO tarea : todasLasTareas) {
-            if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
-                esfuerzoAcumulado += tarea.getEsfuerzo();
-                tareasDentroDelLimite.add(tarea);
-            } else {
-                tareasExcedidas.add(tarea);
+                todasLasTareas.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
             }
+
+            // Ordenar por valoración ponderada (descendente)
+            todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
+
+            // Aplicar lógica de mochila
+            double esfuerzoAcumulado = 0;
+            for (ResultadoTareaDTO tarea : todasLasTareas) {
+                if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
+                    esfuerzoAcumulado += tarea.getEsfuerzo();
+                    tareasDentroDelLimite.add(tarea);
+                } else {
+                    tareasExcedidas.add(tarea);
+                }
+            }
+
+            // Guardar las listas en la sesión
+            session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+            session.setAttribute("tareasExcedidas", tareasExcedidas);
         }
 
         // Obtener contribuciones para las tareas incluidas
         List<Map<String, Object>> contribuciones = calcularContribuciones(proyecto, tareasDentroDelLimite);
 
-        session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
-        session.setAttribute("tareasExcedidas", tareasExcedidas);
+        // Convertir tareas dentro del límite a JSON
+        String tareasJson = "";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            tareasJson = objectMapper.writeValueAsString(tareasDentroDelLimite);
+        } catch (JsonProcessingException e) {
+            System.err.println("Error al convertir tareas a JSON: " + e.getMessage());
+            tareasJson = "[]"; // Devolver un JSON vacío en caso de error
+        }
+        model.addAttribute("tareasJson", tareasJson);
 
         // Añadir los resultados al modelo
         model.addAttribute("proyecto", proyecto);
@@ -153,29 +173,21 @@ public class AdminController {
         return "projectResults";
     }
 
+
     @PostMapping("/admin/expulsarTarea")
     public String expulsarTarea(
             @RequestParam("idTarea") Long idTarea,
             @RequestParam("idProyecto") Long idProyecto,
             HttpSession session,
-            Model model) {
+            Model model) throws JsonProcessingException {
 
-        System.out.println("Expulsar tarea iniciada para tarea ID: " + idTarea + " en proyecto ID: " + idProyecto);
-
-        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
-        if (proyectoOpt.isEmpty()) {
-            System.out.println("Error: Proyecto no encontrado.");
-            model.addAttribute("error", "El proyecto especificado no existe.");
-            return mostrarResultadoProyecto(idProyecto, session, model);
-        }
-
-        Proyecto proyecto = proyectoOpt.get();
+        System.out.println("Iniciando expulsión de tarea con ID: " + idTarea + " para el proyecto ID: " + idProyecto);
 
         List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
         List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
         if (tareasDentroDelLimite == null || tareasExcedidas == null) {
-            System.out.println("Error: Listas de tareas no inicializadas.");
+            System.out.println("Error: Listas no inicializadas en sesión.");
             return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
@@ -192,18 +204,14 @@ public class AdminController {
             tareasExcedidas.add(tareaAExpulsar);
             System.out.println("Tarea expulsada: " + tareaAExpulsar);
         } else {
-            System.out.println("Error: Tarea no encontrada en la lista dentro del límite.");
+            System.out.println("Error: Tarea no encontrada en la lista de tareas dentro del límite.");
         }
 
         System.out.println("Tareas dentro del límite después de expulsar: " + tareasDentroDelLimite);
         System.out.println("Tareas excedidas después de expulsar: " + tareasExcedidas);
 
-        model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
-        model.addAttribute("tareasExcedidas", tareasExcedidas);
-
         session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         session.setAttribute("tareasExcedidas", tareasExcedidas);
-
 
         return mostrarResultadoProyecto(idProyecto, session, model);
     }
@@ -213,35 +221,33 @@ public class AdminController {
             @RequestParam("idTarea") Long idTarea,
             @RequestParam("idProyecto") Long idProyecto,
             HttpSession session,
-            Model model) {
+            Model model) throws JsonProcessingException {
 
-        System.out.println("Forzar entrada iniciada para tarea ID: " + idTarea + " en proyecto ID: " + idProyecto);
+        System.out.println("Iniciando forzar entrada de tarea con ID: " + idTarea + " para el proyecto ID: " + idProyecto);
+
+        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
+        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
+
+        if (tareasDentroDelLimite == null || tareasExcedidas == null) {
+            System.out.println("Error: Listas no inicializadas en sesión.");
+            return mostrarResultadoProyecto(idProyecto, session, model);
+        }
+
+        System.out.println("Tareas dentro del límite antes de forzar: " + tareasDentroDelLimite);
+        System.out.println("Tareas excedidas antes de forzar: " + tareasExcedidas);
 
         Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
         if (proyectoOpt.isEmpty()) {
             System.out.println("Error: Proyecto no encontrado.");
-            model.addAttribute("error", "El proyecto especificado no existe.");
             return mostrarResultadoProyecto(idProyecto, session, model);
         }
 
         Proyecto proyecto = proyectoOpt.get();
         double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
-        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
-
-        if (tareasDentroDelLimite == null || tareasExcedidas == null) {
-            System.out.println("Error: Listas de tareas no inicializadas.");
-            return mostrarResultadoProyecto(idProyecto, session, model);
-        }
-
         double esfuerzoAcumulado = tareasDentroDelLimite.stream()
                 .mapToDouble(ResultadoTareaDTO::getEsfuerzo)
                 .sum();
-
-        System.out.println("Esfuerzo acumulado actual: " + esfuerzoAcumulado);
-        System.out.println("Tareas dentro del límite antes de forzar: " + tareasDentroDelLimite);
-        System.out.println("Tareas excedidas antes de forzar: " + tareasExcedidas);
 
         ResultadoTareaDTO tareaAForzar = tareasExcedidas.stream()
                 .filter(t -> t.getIdTarea().equals(idTarea))
@@ -249,37 +255,41 @@ public class AdminController {
                 .orElse(null);
 
         if (tareaAForzar != null) {
-            if (esfuerzoAcumulado + tareaAForzar.getEsfuerzo() > esfuerzoMaximo) {
-                System.out.println("Error: Esfuerzo excede el límite máximo permitido.");
-                model.addAttribute("error", "No se puede forzar la entrada de la tarea porque excede el esfuerzo máximo permitido.");
-            } else {
+            System.out.println("Esfuerzo actual acumulado: " + esfuerzoAcumulado);
+            System.out.println("Esfuerzo de la tarea a forzar: " + tareaAForzar.getEsfuerzo());
+
+            if (esfuerzoAcumulado + tareaAForzar.getEsfuerzo() <= esfuerzoMaximo) {
                 tareasExcedidas.remove(tareaAForzar);
                 tareasDentroDelLimite.add(tareaAForzar);
                 System.out.println("Tarea forzada a entrar: " + tareaAForzar);
+            } else {
+                System.out.println("Error: No se puede forzar la entrada. Esfuerzo máximo excedido.");
+                model.addAttribute("error", "No se puede forzar la entrada de la tarea porque excede el esfuerzo máximo permitido.");
             }
         } else {
-            System.out.println("Error: Tarea no encontrada en la lista excedida.");
+            System.out.println("Error: Tarea no encontrada en la lista de tareas excedidas.");
         }
 
         System.out.println("Tareas dentro del límite después de forzar: " + tareasDentroDelLimite);
         System.out.println("Tareas excedidas después de forzar: " + tareasExcedidas);
 
-        model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
-        model.addAttribute("tareasExcedidas", tareasExcedidas);
-
         session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         session.setAttribute("tareasExcedidas", tareasExcedidas);
-
 
         return mostrarResultadoProyecto(idProyecto, session, model);
     }
 
+
     @PostMapping("/admin/resetCambios")
     public String resetCambios(@RequestParam("idProyecto") Long idProyecto, HttpSession session) {
-        session.removeAttribute("tareasExpulsadas");
-        session.removeAttribute("tareasForzadas");
+        // Eliminar las listas modificadas de la sesión
+        session.removeAttribute("tareasDentroDelLimite");
+        session.removeAttribute("tareasExcedidas");
+
+        // Redirigir a `mostrarResultadoProyecto` para recalcular las listas desde cero
         return "redirect:/admin/result?idProyecto=" + idProyecto;
     }
+
 
     @PostMapping("/admin/updateBudget")
     public String updateBudget(@RequestParam("idProyecto") Integer idProyecto,
@@ -478,5 +488,16 @@ public class AdminController {
 
         return contribuciones;
     }
+
+    public String convertirAJson(Object objeto) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(objeto);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "{}"; // Retorna un JSON vacío en caso de error
+        }
+    }
+
 
 }

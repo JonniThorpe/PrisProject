@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados del Proyecto</title>
     <link th:href="@{/result.css}" rel="stylesheet">
-    <link rel="stylesheet" href="/src/main/resources/static/result.css">
+    <script th:src="@{'https://unpkg.com/vis-network/standalone/umd/vis-network.min.js'}"></script>
 </head>
 <body>
 <header>
@@ -85,17 +85,20 @@
 
     </section>
 
-        <button type="submit" th:onclick="'javascript:mostrarModalContribucion()'" class="btn btn-outside">
-            Ver Contribución
-        </button>
+    <button type="submit" onclick="javascript:mostrarModalContribucion()" class="btn btn-outside">
+        Ver Contribución
+    </button>
 
     <form th:action="@{/admin/resetCambios}" method="post" style="display:inline;">
         <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
         <button type="submit" class="btn btn-warning">Reiniciar Cambios</button>
     </form>
 
+    <button type="submit" class="btn btn-outside" th:onclick="'javascript:mostrarModalGrafo()'">Ver Grafo</button>
+
 </main>
 
+<script type="application/json" id="tareasData" th:utext="${tareasJson}"></script>
 
 <div id="modalVerContribucion" class="modal hidden">
     <div class="modal-content">
@@ -121,25 +124,14 @@
 </div>
 <div id="modalOverlay" class="modal-overlay hidden"></div>
 
-
-<div id="modalCambioTarea" class="hidden modal">
+<div id="modalVerGrafo" class="modal hidden">
     <div class="modal-content">
-        <h4>Cambiar tarea</h4>
-        <p>Selecciona una tarea dentro del límite para reemplazar:</p>
-        <form th:action="@{/admin/cambiarTarea}" method="post">
-            <input type="hidden" id="idTareaExcedida" name="idTareaExcedida">
-            <input type="hidden" id="idProyecto" name="idProyecto" th:value="${proyecto.id}">
-            <select name="idTareaDentro" id="idTareaDentro" required>
-                <option th:each="tarea : ${tareasDentroDelLimite}" th:value="${tarea.idTarea}" th:text="${tarea.nombreTarea}"></option>
-            </select>
-            <div class="modal-buttons">
-                <button type="submit" class="btn btn-success">Confirmar</button>
-                <button type="button" class="btn btn-danger" onclick="cerrarModal()">Cancelar</button>
-            </div>
-        </form>
+        <h4>Grafo de Tareas Dentro del Límite</h4>
+        <div id="grafoContainer" style="width: 100%; height: 400px;"></div>
+        <button class="btn btn-danger" onclick="cerrarModalGrafo()">Cerrar</button>
     </div>
 </div>
-
+<div id="modalOverlay2" class="modal-overlay hidden"></div>
 
 <script th:src="@{/result.js}"></script>
 </body>

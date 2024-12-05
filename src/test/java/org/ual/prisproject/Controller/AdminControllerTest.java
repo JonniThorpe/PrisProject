@@ -1,5 +1,6 @@
 package Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import entidades.*;
 import dto.*;
 import jakarta.servlet.http.HttpSession;
@@ -107,7 +108,7 @@ class AdminControllerTest {
     }
 
     @Test
-    void testMostrarResultadoProyecto_SinSesion() {
+    void testMostrarResultadoProyecto_SinSesion() throws JsonProcessingException {
         when(session.getAttribute("rol")).thenReturn(null);
 
         String view = adminController.mostrarResultadoProyecto(1L, session, model);
@@ -116,7 +117,7 @@ class AdminControllerTest {
     }
 
     @Test
-    void testMostrarResultadoProyecto_ProyectoNoEncontrado() {
+    void testMostrarResultadoProyecto_ProyectoNoEncontrado() throws JsonProcessingException {
         when(session.getAttribute("rol")).thenReturn("Admin");
         when(session.getAttribute("idUsuario")).thenReturn(1);
 
@@ -128,7 +129,7 @@ class AdminControllerTest {
     }
 
     @Test
-    void testMostrarResultadoProyecto_ProyectoEncontrado() {
+    void testMostrarResultadoProyecto_ProyectoEncontrado() throws JsonProcessingException {
         when(session.getAttribute("rol")).thenReturn("Admin");
         when(session.getAttribute("idUsuario")).thenReturn(1);
 
