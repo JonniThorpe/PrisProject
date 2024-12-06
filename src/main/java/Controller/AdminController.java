@@ -135,14 +135,22 @@ public class AdminController {
             todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
             double esfuerzoAcumulado = 0;
+            boolean excedido = false; // Bandera para detener el procesamiento
+
             for (ResultadoTareaDTO tarea : todasLasTareas) {
-                if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
-                    esfuerzoAcumulado += tarea.getEsfuerzo();
-                    tareasDentroDelLimite.add(tarea);
+                if (!excedido) {
+                    if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
+                        esfuerzoAcumulado += tarea.getEsfuerzo();
+                        tareasDentroDelLimite.add(tarea);
+                    } else {
+                        excedido = true; // Marcamos que se excedió el límite
+                        tareasExcedidas.add(tarea); // Añadimos la tarea que excede el límite
+                    }
                 } else {
-                    tareasExcedidas.add(tarea);
+                    tareasExcedidas.add(tarea); // Todas las demás se consideran excedidas
                 }
             }
+
 
             session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
             session.setAttribute("tareasExcedidas", tareasExcedidas);

@@ -136,22 +136,22 @@ button:hover {
     transform: scale(1.1); /* Efecto de agrandamiento al pasar por encima */
 }
 
+/* Tablas Responsivas */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 table {
     width: 100%;
+    min-width: 600px;
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 1rem;
     background-color: var(--color-white);
     border-radius: var(--border-radius-1);
     overflow: hidden;
-}
-
-thead th #valoracionIn {
-    color: var(--color-success);
-}
-
-thead th #valoracionOut {
-    color: var(--color-danger);
 }
 
 thead {
@@ -163,7 +163,6 @@ thead {
 thead th {
     padding: var(--padding-1);
     text-align: left;
-    color: #555555
 }
 
 tbody tr {
@@ -347,19 +346,7 @@ button:hover {
     }
 }
 
-
-@media (max-width: 768px) {
-    .modal-content {
-        max-width: 90%;
-        padding: 15px;
-    }
-
-    .btn {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-    }
-}
-
+/* Responsivo */
 @media (max-width: 768px) {
     header, main {
         padding: 10px;
@@ -369,18 +356,27 @@ button:hover {
         padding: var(--padding-1);
     }
 
-    h2 {
-        font-size: 1.2rem;
+    h1 {
+        font-size: 1.4rem;
     }
 
     table {
         font-size: 0.9rem;
     }
+
+    button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
 }
 
 @media (max-width: 480px) {
-    h2 {
-        font-size: 1rem;
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
     }
 
     table {
@@ -389,6 +385,10 @@ button:hover {
 
     button {
         font-size: 0.8rem;
-        padding: 8px 16px;
+        padding: 6px 12px;
+    }
+
+    .modal-content {
+        padding: 15px;
     }
 }
