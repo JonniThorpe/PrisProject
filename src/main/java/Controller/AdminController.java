@@ -6,6 +6,7 @@ import dto.ResultadoTareaDTO;
 import dto.ValoracionDTO;
 import entidades.*;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,11 +17,18 @@ import repository.ProyectoHasUsuarioRepository;
 import repository.ProyectoRepository;
 import repository.TareaRepository;
 import repository.DependenciaRepository;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import repository.UsuarioRepository;
 
 import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
+import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Controller
 public class AdminController {
@@ -628,6 +636,193 @@ public class AdminController {
         return "redirect:/admin/dependencias?idTarea=" + idTarea;
     }
 
+    @PostMapping("/admin/exportarPDF")
+    public void exportarPDF(@RequestParam("idProyecto") Long idProyecto, HttpServletResponse response, HttpSession session) throws IOException, DocumentException {
+        Optional<Proyecto> proyectoOpt = proyectoRepository.findById(idProyecto);
+
+        if (proyectoOpt.isEmpty()) {
+            throw new IllegalArgumentException("El proyecto no existe");
+        }
+
+        Proyecto proyecto = proyectoOpt.get();
+
+        // Verificar y cargar datos si no están en la sesión
+        List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
+        List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
+        List<Map<String, Object>> contribuciones = (List<Map<String, Object>>) session.getAttribute("contribuciones");
+        List<Map<String, Object>> coberturaClientes = (List<Map<String, Object>>) session.getAttribute("cobertura");
+
+        if (tareasDentroDelLimite == null || tareasExcedidas == null || contribuciones == null || coberturaClientes == null) {
+            List<Object[]> resultados = tareaRepository.obtenerTareasConValoracionPonderada(idProyecto, "Client");
+            tareasDentroDelLimite = new ArrayList<>();
+            tareasExcedidas = new ArrayList<>();
+
+            double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
+
+            // Procesar tareas dentro del límite y excedidas
+            List<ResultadoTareaDTO> todasLasTareas = new ArrayList<>();
+            for (Object[] resultado : resultados) {
+                Long idTarea = ((Number) resultado[0]).longValue();
+                String nombreTarea = (String) resultado[1];
+                Integer esfuerzo = ((Number) resultado[2]).intValue();
+                Double valoracionPonderada = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+
+                todasLasTareas.add(new ResultadoTareaDTO(idTarea, nombreTarea, esfuerzo, valoracionPonderada));
+            }
+
+            todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
+
+            double esfuerzoAcumulado = 0;
+            boolean excedido = false;
+
+            for (ResultadoTareaDTO tarea : todasLasTareas) {
+                if (!excedido) {
+                    if (esfuerzoAcumulado + tarea.getEsfuerzo() <= esfuerzoMaximo) {
+                        esfuerzoAcumulado += tarea.getEsfuerzo();
+                        tareasDentroDelLimite.add(tarea);
+                    } else {
+                        excedido = true;
+                        tareasExcedidas.add(tarea);
+                    }
+                } else {
+                    tareasExcedidas.add(tarea);
+                }
+            }
+
+            // Guardar en la sesión para futuros accesos
+            session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
+            session.setAttribute("tareasExcedidas", tareasExcedidas);
+
+            // Calcular contribuciones y cobertura si no existen
+            contribuciones = calcularContribuciones(proyecto, tareasDentroDelLimite);
+            coberturaClientes = calcularCobertura(proyecto, tareasDentroDelLimite, tareasExcedidas);
+            session.setAttribute("contribuciones", contribuciones);
+            session.setAttribute("cobertura", coberturaClientes);
+        }
+
+        // Configuración del PDF
+        Document document = new Document();
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=Resultado_Proyecto_" + proyecto.getNombre() + ".pdf");
+        PdfWriter.getInstance(document, response.getOutputStream());
+
+        document.open();
+
+        // Título
+        Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph("Resultados del Proyecto: " + proyecto.getNombre(), titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+
+        // Tabla de tareas dentro del límite con productividad
+        document.add(new Paragraph("Tareas Dentro del Límite", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        PdfPTable tablaTareas = new PdfPTable(4); // Añadimos una columna para "Productividad"
+        tablaTareas.setWidthPercentage(100);
+        tablaTareas.addCell("Nombre");
+        tablaTareas.addCell("Esfuerzo");
+        tablaTareas.addCell("Satisfacción");
+        tablaTareas.addCell("Productividad"); // Nueva columna
+
+        for (ResultadoTareaDTO tarea : tareasDentroDelLimite) {
+            tablaTareas.addCell(tarea.getNombreTarea());
+            tablaTareas.addCell(String.valueOf(tarea.getEsfuerzo()));
+            tablaTareas.addCell(String.valueOf(tarea.getValoracionPonderada()));
+            // Calcular la productividad (satisfacción / esfuerzo)
+            double productividad = tarea.getEsfuerzo() > 0 ? tarea.getValoracionPonderada() / tarea.getEsfuerzo() : 0.0;
+            tablaTareas.addCell(String.format("%.2f", productividad));
+        }
+        document.add(tablaTareas);
+
+        // Contribuciones de los clientes con columna tarea
+        document.add(new Paragraph("\nContribuciones de los Clientes", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        PdfPTable tablaContribuciones = new PdfPTable(3); // Añadimos una columna para "Tarea"
+        tablaContribuciones.setWidthPercentage(100);
+        tablaContribuciones.addCell("Cliente");
+        tablaContribuciones.addCell("Tarea"); // Nueva columna
+        tablaContribuciones.addCell("Contribución");
+
+        for (Map<String, Object> contribucion : contribuciones) {
+            tablaContribuciones.addCell((String) contribucion.get("cliente"));
+            tablaContribuciones.addCell((String) contribucion.get("tarea")); // Añadir la tarea asociada
+            tablaContribuciones.addCell(String.format("%.2f", contribucion.get("contribucion")));
+        }
+        document.add(tablaContribuciones);
+
+        // Cobertura de los clientes
+        document.add(new Paragraph("\nCobertura de los Clientes", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        PdfPTable tablaCobertura = new PdfPTable(2);
+        tablaCobertura.setWidthPercentage(100);
+        tablaCobertura.addCell("Cliente");
+        tablaCobertura.addCell("Cobertura");
+
+        for (Map<String, Object> cobertura : coberturaClientes) {
+            tablaCobertura.addCell((String) cobertura.get("cliente"));
+            tablaCobertura.addCell(String.format("%.2f", cobertura.get("cobertura")));
+        }
+        document.add(tablaCobertura);
+
+        // Tareas Excedidas (se mantiene)
+        document.add(new Paragraph("\nTareas Excedidas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        PdfPTable tablaTareasExcedidas = new PdfPTable(3);
+        tablaTareasExcedidas.setWidthPercentage(100);
+        tablaTareasExcedidas.addCell("Nombre");
+        tablaTareasExcedidas.addCell("Esfuerzo");
+        tablaTareasExcedidas.addCell("Satisfacción");
+
+        for (ResultadoTareaDTO tarea : tareasExcedidas) {
+            tablaTareasExcedidas.addCell(tarea.getNombreTarea());
+            tablaTareasExcedidas.addCell(String.valueOf(tarea.getEsfuerzo()));
+            tablaTareasExcedidas.addCell(String.valueOf(tarea.getValoracionPonderada()));
+        }
+        document.add(tablaTareasExcedidas);
+
+        // Cerrar el documento
+        document.close();
+    }
+    
+    private List<Map<String, Object>> calcularCobertura(Proyecto proyecto, List<ResultadoTareaDTO> tareasDentroDelLimite, List<ResultadoTareaDTO> tareasExcedidas) {
+        List<Map<String, Object>> coberturaClientes = new ArrayList<>();
+        List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
+
+        for (ProyectoHasUsuario phu : clientesProyecto) {
+            Usuario cliente = phu.getUsuarioIdusuario();
+
+            // Sumar valoraciones del cliente a tareas dentro de la solución
+            double valoracionesEnSolucion = tareasDentroDelLimite.stream()
+                    .mapToDouble(tarea -> {
+                        Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(
+                                cliente.getId().longValue(),
+                                tarea.getIdTarea()
+                        );
+                        return valoracionOpt.map(UsuarioValoraTarea::getValoracion).orElse(0);
+                    })
+                    .sum();
+
+            // Sumar valoraciones totales del cliente (tareas dentro y fuera de la solución)
+            double valoracionesTotales = Stream.concat(tareasDentroDelLimite.stream(), tareasExcedidas.stream())
+                    .mapToDouble(tarea -> {
+                        Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(
+                                cliente.getId().longValue(),
+                                tarea.getIdTarea()
+                        );
+                        return valoracionOpt.map(UsuarioValoraTarea::getValoracion).orElse(0);
+                    })
+                    .sum();
+
+            // Calcular cobertura
+            double cobertura = valoracionesTotales > 0 ? valoracionesEnSolucion / valoracionesTotales : 0.0;
+
+            // Crear mapa de cobertura
+            Map<String, Object> coberturaData = new HashMap<>();
+            coberturaData.put("cliente", cliente.getNombre());
+            coberturaData.put("cobertura", cobertura);
+
+            coberturaClientes.add(coberturaData);
+        }
+
+        return coberturaClientes;
+    }
 
     private List<Map<String, Object>> calcularContribuciones(Proyecto proyecto, List<ResultadoTareaDTO> tareasDentroDelLimite) {
         List<Map<String, Object>> contribuciones = new ArrayList<>();

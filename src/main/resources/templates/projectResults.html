@@ -115,6 +115,11 @@
 
     <button type="button" class="btn btn-outside" onclick="mostrarModalDependenciasGrafo()">Ver Grafo de Dependencias</button>
 
+    <form th:action="@{/admin/exportarPDF}" method="post" style="margin-top: 20px;">
+        <input type="hidden" name="idProyecto" th:value="${proyecto.id}" />
+        <button type="submit" class="btn btn-primary">Exportar a PDF</button>
+    </form>
+
 </main>
 
 <script type="application/json" id="tareasData" th:utext="${tareasJson}"></script>
