@@ -2,6 +2,7 @@ package Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.pdf.PdfContentByte;
 import dto.ResultadoTareaDTO;
 import dto.ValoracionDTO;
 import entidades.*;
@@ -701,12 +702,20 @@ public class AdminController {
         }
 
         // Configuración del PDF
-        Document document = new Document();
+        Document document = new Document(PageSize.A4, 36, 36, 120, 72); // Márgenes: 36px lados, 72px arriba/abajo
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=Resultado_Proyecto_" + proyecto.getNombre() + ".pdf");
-        PdfWriter.getInstance(document, response.getOutputStream());
+        PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
+
+        // Agregar imagen como fondo
+        PdfContentByte canvas = writer.getDirectContentUnder();
+        String rutaImagen = "src/main/resources/static/images/plantilla.png"; // Ruta relativa
+        Image background = Image.getInstance(rutaImagen);
+        background.scaleToFit(PageSize.A4.getWidth(), PageSize.A4.getHeight());
+        background.setAbsolutePosition(0, 0);
+        canvas.addImage(background);
 
         // Título
         Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
