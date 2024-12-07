@@ -704,7 +704,7 @@ public class AdminController {
         // Configuración del PDF
         Document document = new Document(PageSize.A4, 36, 36, 120, 72); // Márgenes: 36px lados, 72px arriba/abajo
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=Resultado_Proyecto_" + proyecto.getNombre() + ".pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=proyecto_" + proyecto.getNombre() + ".pdf");
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
@@ -719,7 +719,7 @@ public class AdminController {
 
         // Título
         Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-        Paragraph title = new Paragraph("Resultados del Proyecto: " + proyecto.getNombre(), titleFont);
+        Paragraph title = new Paragraph("Proyecto " + proyecto.getNombre(), titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(20);
         document.add(title);
