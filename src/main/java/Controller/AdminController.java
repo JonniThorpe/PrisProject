@@ -725,7 +725,9 @@ public class AdminController {
         document.add(title);
 
         // Tabla de tareas dentro del límite con productividad
-        document.add(new Paragraph("Tareas en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        Paragraph tareasTitulo = new Paragraph("Tareas en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        tareasTitulo.setSpacingAfter(10); // Espacio de 10 puntos después del título
+        document.add(tareasTitulo);
         PdfPTable tablaTareas = new PdfPTable(4); // Añadimos una columna para "Productividad"
         tablaTareas.setWidthPercentage(100);
         tablaTareas.addCell("Nombre");
@@ -744,8 +746,9 @@ public class AdminController {
         document.add(tablaTareas);
 
         // Contribuciones de los clientes con columna tarea
-        document.add(new Paragraph("\nContribuciones de Cada Cliente en Tareas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
-        PdfPTable tablaContribuciones = new PdfPTable(3); // Añadimos una columna para "Tarea"
+        Paragraph contribucionesTitulo = new Paragraph("Contribuciones de Cada Cliente en Tareas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        contribucionesTitulo.setSpacingAfter(10); // Espacio de 10 puntos después del título
+        document.add(contribucionesTitulo);        PdfPTable tablaContribuciones = new PdfPTable(3); // Añadimos una columna para "Tarea"
         tablaContribuciones.setWidthPercentage(100);
         tablaContribuciones.addCell("Cliente");
         tablaContribuciones.addCell("Tarea"); // Nueva columna
@@ -759,7 +762,9 @@ public class AdminController {
         document.add(tablaContribuciones);
 
         // Cobertura de los clientes
-        document.add(new Paragraph("\nCobertura de los Clientes en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        Paragraph coberturaTitulo = new Paragraph("\nCobertura de los Clientes en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        coberturaTitulo.setSpacingAfter(10); // Espacio de 10 puntos después del título
+        document.add(coberturaTitulo);
         PdfPTable tablaCobertura = new PdfPTable(2);
         tablaCobertura.setWidthPercentage(100);
         tablaCobertura.addCell("Cliente");
