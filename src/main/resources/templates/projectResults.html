@@ -94,6 +94,8 @@
         </table>
     </section>
 
+    <span class="span-buttons">
+
     <button type="submit" onclick="javascript:mostrarModalContribucion()" class="btn btn-outside">
         Ver Contribución
     </button>
@@ -106,7 +108,7 @@
         Ver Cobertura de la Solución
     </button>
 
-    <form th:action="@{/admin/resetCambios}" method="post" style="display:inline;">
+    <form th:action="@{/admin/resetCambios}" method="post">
         <input type="hidden" name="idProyecto" th:value="${proyecto.id}">
         <button type="submit" class="btn btn-warning">Reiniciar Cambios</button>
     </form>
@@ -115,10 +117,12 @@
 
     <button type="button" class="btn btn-outside" onclick="mostrarModalDependenciasGrafo()">Ver Grafo de Dependencias</button>
 
-    <form th:action="@{/admin/exportarPDF}" method="post" style="margin-top: 20px;">
+    <form th:action="@{/admin/exportarPDF}" method="post">
         <input type="hidden" name="idProyecto" th:value="${proyecto.id}" />
-        <button type="submit" class="btn btn-primary">Exportar a PDF</button>
+        <button type="submit" class="btn btn-outside">Exportar a PDF</button>
     </form>
+
+    </span>
 
 </main>
 
