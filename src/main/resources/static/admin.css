@@ -158,10 +158,6 @@ section > form {
     text-decoration: none;
 }
 
-.project-details {
-    width: 100%;
-}
-
 button {
     background-color: transparent;
     color: var(--color-primary);
