@@ -777,7 +777,9 @@ public class AdminController {
         document.add(tablaCobertura);
 
         // Tareas Excedidas (se mantiene)
-        document.add(new Paragraph("\nTareas Excedidas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        Paragraph tareasExcedidasTitulo = new Paragraph("\nTareas Excedidas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        tareasExcedidasTitulo.setSpacingAfter(10); // Espacio de 10 puntos después del título
+        document.add(tareasExcedidasTitulo);
         PdfPTable tablaTareasExcedidas = new PdfPTable(4);
         tablaTareasExcedidas.setWidthPercentage(100);
         tablaTareasExcedidas.addCell("Nombre");
