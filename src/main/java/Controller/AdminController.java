@@ -716,7 +716,7 @@ public class AdminController {
         document.add(title);
 
         // Tabla de tareas dentro del límite con productividad
-        document.add(new Paragraph("Tareas Dentro del Límite", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        document.add(new Paragraph("Tareas en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
         PdfPTable tablaTareas = new PdfPTable(4); // Añadimos una columna para "Productividad"
         tablaTareas.setWidthPercentage(100);
         tablaTareas.addCell("Nombre");
@@ -735,7 +735,7 @@ public class AdminController {
         document.add(tablaTareas);
 
         // Contribuciones de los clientes con columna tarea
-        document.add(new Paragraph("\nContribuciones de los Clientes", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        document.add(new Paragraph("\nContribuciones de Cada Cliente en Tareas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
         PdfPTable tablaContribuciones = new PdfPTable(3); // Añadimos una columna para "Tarea"
         tablaContribuciones.setWidthPercentage(100);
         tablaContribuciones.addCell("Cliente");
@@ -750,7 +750,7 @@ public class AdminController {
         document.add(tablaContribuciones);
 
         // Cobertura de los clientes
-        document.add(new Paragraph("\nCobertura de los Clientes", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        document.add(new Paragraph("\nCobertura de los Clientes en la Solución", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
         PdfPTable tablaCobertura = new PdfPTable(2);
         tablaCobertura.setWidthPercentage(100);
         tablaCobertura.addCell("Cliente");
@@ -764,23 +764,27 @@ public class AdminController {
 
         // Tareas Excedidas (se mantiene)
         document.add(new Paragraph("\nTareas Excedidas", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
-        PdfPTable tablaTareasExcedidas = new PdfPTable(3);
+        PdfPTable tablaTareasExcedidas = new PdfPTable(4);
         tablaTareasExcedidas.setWidthPercentage(100);
         tablaTareasExcedidas.addCell("Nombre");
         tablaTareasExcedidas.addCell("Esfuerzo");
         tablaTareasExcedidas.addCell("Satisfacción");
+        tablaTareasExcedidas.addCell("Productividad");
+
 
         for (ResultadoTareaDTO tarea : tareasExcedidas) {
             tablaTareasExcedidas.addCell(tarea.getNombreTarea());
             tablaTareasExcedidas.addCell(String.valueOf(tarea.getEsfuerzo()));
             tablaTareasExcedidas.addCell(String.valueOf(tarea.getValoracionPonderada()));
+            double productividad = tarea.getEsfuerzo() > 0 ? tarea.getValoracionPonderada() / tarea.getEsfuerzo() : 0.0;
+            tablaTareasExcedidas.addCell(String.format("%.2f", productividad));
         }
         document.add(tablaTareasExcedidas);
 
         // Cerrar el documento
         document.close();
     }
-    
+
     private List<Map<String, Object>> calcularCobertura(Proyecto proyecto, List<ResultadoTareaDTO> tareasDentroDelLimite, List<ResultadoTareaDTO> tareasExcedidas) {
         List<Map<String, Object>> coberturaClientes = new ArrayList<>();
         List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
