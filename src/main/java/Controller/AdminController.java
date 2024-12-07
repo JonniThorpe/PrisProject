@@ -20,6 +20,7 @@ import repository.DependenciaRepository;
 import repository.UsuarioRepository;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Controller
 public class AdminController {
@@ -113,7 +114,6 @@ public class AdminController {
         Proyecto proyecto = proyectoOpt.get();
         double esfuerzoMaximo = proyecto.getPesoMaximoTareas();
 
-        // Obtener tareas
         List<ResultadoTareaDTO> tareasDentroDelLimite = (List<ResultadoTareaDTO>) session.getAttribute("tareasDentroDelLimite");
         List<ResultadoTareaDTO> tareasExcedidas = (List<ResultadoTareaDTO>) session.getAttribute("tareasExcedidas");
 
@@ -135,7 +135,7 @@ public class AdminController {
             todasLasTareas.sort(Comparator.comparing(ResultadoTareaDTO::getValoracionPonderada).reversed());
 
             double esfuerzoAcumulado = 0;
-            boolean excedido = false; // Bandera para detener el procesamiento
+            boolean excedido = false;
 
             for (ResultadoTareaDTO tarea : todasLasTareas) {
                 if (!excedido) {
@@ -143,20 +143,89 @@ public class AdminController {
                         esfuerzoAcumulado += tarea.getEsfuerzo();
                         tareasDentroDelLimite.add(tarea);
                     } else {
-                        excedido = true; // Marcamos que se excedió el límite
-                        tareasExcedidas.add(tarea); // Añadimos la tarea que excede el límite
+                        excedido = true;
+                        tareasExcedidas.add(tarea);
                     }
                 } else {
-                    tareasExcedidas.add(tarea); // Todas las demás se consideran excedidas
+                    tareasExcedidas.add(tarea);
                 }
             }
-
 
             session.setAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
             session.setAttribute("tareasExcedidas", tareasExcedidas);
         }
 
-        List<Map<String, Object>> contribuciones = calcularContribuciones(proyecto, tareasDentroDelLimite);
+        double sumaSatisfaccion = tareasDentroDelLimite.stream()
+                .mapToDouble(ResultadoTareaDTO::getValoracionPonderada)
+                .sum();
+
+        double sumaEsfuerzo = tareasDentroDelLimite.stream()
+                .mapToDouble(ResultadoTareaDTO::getEsfuerzo)
+                .sum();
+
+        double productividad = sumaEsfuerzo > 0 ? sumaSatisfaccion / sumaEsfuerzo : 0.0;
+
+        List<Map<String, Object>> contribucionesSolucion = new ArrayList<>();
+        if (sumaSatisfaccion > 0) {
+            List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
+
+            for (ProyectoHasUsuario phu : clientesProyecto) {
+                Usuario cliente = phu.getUsuarioIdusuario();
+
+                double sumaPonderadaCliente = tareasDentroDelLimite.stream()
+                        .mapToDouble(tarea -> {
+                            Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(
+                                    cliente.getId().longValue(),
+                                    tarea.getIdTarea()
+                            );
+                            return valoracionOpt.map(valoracion -> phu.getPesoCliente() * valoracion.getValoracion()).orElse(0);
+                        })
+                        .sum();
+
+                double contribucion = sumaPonderadaCliente / sumaSatisfaccion;
+
+                Map<String, Object> contribucionData = new HashMap<>();
+                contribucionData.put("cliente", cliente.getNombre());
+                contribucionData.put("contribucion", contribucion);
+
+                contribucionesSolucion.add(contribucionData);
+            }
+        }
+
+        List<Map<String, Object>> coberturaClientes = new ArrayList<>();
+        List<ProyectoHasUsuario> clientesProyecto = proyectoHasUsuarioRepository.findByProyectoIdproyecto(proyecto);
+
+        for (ProyectoHasUsuario phu : clientesProyecto) {
+            Usuario cliente = phu.getUsuarioIdusuario();
+
+            double valoracionesEnSolucion = tareasDentroDelLimite.stream()
+                    .mapToDouble(tarea -> {
+                        Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(
+                                cliente.getId().longValue(),
+                                tarea.getIdTarea()
+                        );
+                        return valoracionOpt.map(UsuarioValoraTarea::getValoracion).orElse(0);
+                    })
+                    .sum();
+
+            double valoracionesTotales = Stream.concat(tareasDentroDelLimite.stream(), tareasExcedidas.stream())
+                    .mapToDouble(tarea -> {
+                        Optional<UsuarioValoraTarea> valoracionOpt = tareaRepository.findValoracionByClienteAndTarea(
+                                cliente.getId().longValue(),
+                                tarea.getIdTarea()
+                        );
+                        return valoracionOpt.map(UsuarioValoraTarea::getValoracion).orElse(0);
+                    })
+                    .sum();
+
+            double cobertura = valoracionesTotales > 0 ? valoracionesEnSolucion / valoracionesTotales : 0.0;
+
+            Map<String, Object> coberturaData = new HashMap<>();
+            coberturaData.put("cliente", cliente.getNombre());
+            coberturaData.put("cobertura", cobertura);
+
+            coberturaClientes.add(coberturaData);
+        }
 
         // Grafo de dependencias
         List<Map<String, Object>> grafoDependencias = new ArrayList<>();
@@ -180,10 +249,14 @@ public class AdminController {
         model.addAttribute("tareasDentroDelLimite", tareasDentroDelLimite);
         model.addAttribute("tareasExcedidas", tareasExcedidas);
         model.addAttribute("esfuerzoMaximo", esfuerzoMaximo);
-        model.addAttribute("contribuciones", contribuciones);
+        model.addAttribute("solucion", Map.of("productividad", productividad));
+        model.addAttribute("contribuciones", calcularContribuciones(proyecto, tareasDentroDelLimite));
+        model.addAttribute("contribucionesSolucion", contribucionesSolucion);
+        model.addAttribute("cobertura", coberturaClientes);
 
         return "projectResults";
     }
+
 
     @PostMapping("/admin/expulsarTarea")
     public String expulsarTarea(

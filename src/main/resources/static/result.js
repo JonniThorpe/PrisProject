@@ -32,6 +32,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modalOverlay.addEventListener("click", cerrarModalContribucion);
 
+    // Modal para contribuciones en solución
+    const modalVerContribucionSolucion = document.getElementById("modalVerContribucionSolucion");
+    const modalOverlayContribucion = document.getElementById("modalOverlayContribucion");
+
+    window.mostrarModalContribucionSolucion = function () {
+        modalVerContribucionSolucion.classList.add("show");
+        modalOverlayContribucion.classList.add("show");
+    };
+
+    window.cerrarModalContribucionSolucion = function () {
+        modalVerContribucionSolucion.classList.remove("show");
+        modalOverlayContribucion.classList.remove("show");
+    };
+
+    modalOverlay.addEventListener("click", cerrarModalContribucionSolucion);
+
+    // Modal para cobertura
+    const modalVerCobertura = document.getElementById("modalVerCobertura");
+    const modalOverlayCobertura = document.getElementById("modalOverlayCobertura");
+
+    window.mostrarModalCobertura = function () {
+        modalVerCobertura.classList.add("show");
+        modalOverlayCobertura.classList.add("show");
+    };
+
+    window.cerrarModalCobertura = function () {
+        modalVerCobertura.classList.remove("show");
+        modalOverlayCobertura.classList.remove("show");
+    };
+
+    modalOverlay.addEventListener("click", cerrarModalCobertura);
+
     // Modal para grafo de tareas dentro del límite
     window.mostrarModalGrafo = function () {
         const modalVerGrafo = document.getElementById("modalVerGrafo");

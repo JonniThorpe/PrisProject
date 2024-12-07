@@ -22,8 +22,7 @@
             <button onclick="cerrarErrorPopup()">Cerrar</button>
         </div>
 
-        <h2>Cálculo del Resultado</h2>
-        <h3>Tareas dentro del presupuesto</h3>
+        <h1>Solución Propuesta</h1>
         <table>
             <thead>
             <tr>
@@ -57,8 +56,9 @@
             </tr>
             </tbody>
         </table>
-
-        <h3>Tareas fuera del presupuesto</h3>
+        <h2>La productividad de la solución propuesta es de <strong th:text="${solucion.productividad}"></strong></h2>
+        <br>
+        <h1>Tareas fuera del presupuesto</h1>
         <table>
             <thead>
             <tr>
@@ -96,6 +96,14 @@
 
     <button type="submit" onclick="javascript:mostrarModalContribucion()" class="btn btn-outside">
         Ver Contribución
+    </button>
+
+    <button type="submit" onclick="javascript:mostrarModalContribucionSolucion()" class="btn btn-outside">
+        Ver Contribuciones a la Solución
+    </button>
+
+    <button type="submit" onclick="javascript:mostrarModalCobertura()" class="btn btn-outside">
+        Ver Cobertura de la Solución
     </button>
 
     <form th:action="@{/admin/resetCambios}" method="post" style="display:inline;">
@@ -137,6 +145,50 @@
     </div>
 </div>
 <div id="modalOverlay" class="modal-overlay hidden"></div>
+
+<div id="modalVerContribucionSolucion" class="modal hidden">
+    <div class="modal-content">
+        <h4>Contribuciones de los Clientes</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Contribución</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="contribucionSolucion : ${contribucionesSolucion}">
+                <td th:text="${contribucionSolucion['cliente']}"></td>
+                <td th:text="${contribucionSolucion['contribucion']}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-danger" onclick="cerrarModalContribucionSolucion()">Cerrar</button>
+    </div>
+</div>
+<div id="modalOverlayContribucion" class="modal-overlay hidden"></div>
+
+<div id="modalVerCobertura" class="modal hidden">
+    <div class="modal-content">
+        <h4>Contribuciones de los Clientes</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Contribución</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cobertura : ${cobertura}">
+                <td th:text="${cobertura['cliente']}"></td>
+                <td th:text="${cobertura['cobertura']}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-danger" onclick="cerrarModalCobertura()">Cerrar</button>
+    </div>
+</div>
+<div id="modalOverlayCobertura" class="modal-overlay hidden"></div>
 
 <div id="modalVerGrafo" class="modal hidden">
     <div class="modal-content">

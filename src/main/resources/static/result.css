@@ -145,7 +145,6 @@ button:hover {
 
 table {
     width: 100%;
-    min-width: 600px;
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 1rem;
@@ -156,13 +155,13 @@ table {
 
 thead {
     background-color: var(--color-primary);
-    color: var(--color-white);
+    color: #555555;
     font-weight: bold;
 }
 
 thead th {
     padding: var(--padding-1);
-    text-align: left;
+    text-align: center;
 }
 
 tbody tr {
@@ -178,7 +177,7 @@ tbody tr:hover {
 tbody td {
     padding: var(--padding-1);
     color: var(--color-dark);
-    text-align: left;
+    text-align: center;
 }
 
 tbody td span {
@@ -362,6 +361,8 @@ button:hover {
 
     table {
         font-size: 0.9rem;
+        width: 100%;
+        height: auto;
     }
 
     button {
@@ -381,6 +382,8 @@ button:hover {
 
     table {
         font-size: 0.8rem;
+        width: 100%;
+        height: auto;
     }
 
     button {
