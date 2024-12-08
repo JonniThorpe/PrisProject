@@ -18,7 +18,11 @@
         - **Productividad de la solución**: Relación entre satisfacción y esfuerzo.
         - **Contribución de los clientes**: Impacto ponderado de los clientes en la solución.
         - **Cobertura**: Nivel de satisfacción alcanzado por los requisitos de los clientes en la solución.
-
+    - Visualización de resultados en tablas y gráficos interactivos:
+        - **Gráficos de Contribuciones y Cobertura**: Muestra la distribución de valoraciones de los clientes en la solución.
+        - **Gráficos de Productividad**: Representa la eficiencia de la solución en términos de satisfacción y esfuerzo.
+        - **Gráficos de Tareas**: Muestra las tareas seleccionadas
+        - **Gráficos de Clientes**: Muestra las contribuciones y cobertura de los clientes.
 3. **Visualización de Dependencias**
     - Visualización jerárquica de las dependencias entre tareas mediante gráficos interactivos.
 
@@ -48,6 +52,7 @@
 - **Librerías**:
     - [Vis.js](https://visjs.github.io/vis-network/) para gráficos de dependencias.
     - Thymeleaf para la generación dinámica de vistas HTML.
+    - [Highcharts](https://www.highcharts.com/) para gráficos interactivos.
 - **Estructura**:
     - Vistas principales como `projectResults.html` muestran resultados detallados de proyectos, contribuciones, y cobertura en tablas y gráficos interactivos.
     - Modales dinámicos para mostrar gráficos y cálculos avanzados.
@@ -127,7 +132,9 @@ Las contribuciones son bienvenidas. Si encuentras errores o deseas mejorar el si
 ## 🏗 **Futuras Mejoras**
 - Integración de notificaciones en tiempo real para actualizaciones de proyectos.
 - Implementación de un sistema de aprendizaje automático para predecir tareas críticas.
-- Exportación de resultados en formato PDF y CSV.
+- Mejora de la interfaz de usuario y experiencia de usuario.
+- Soporte para múltiples bases de datos y servicios en la nube.
+- Integración con herramientas de gestión de proyectos como Jira y Trello.
 
 ---
 
