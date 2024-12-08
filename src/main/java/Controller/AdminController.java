@@ -252,6 +252,41 @@ public class AdminController {
             }
         }
 
+        // Datos JSON para los gráficos
+        Map<String, Object> datosGraficos = new HashMap<>();
+        datosGraficos.put("tareasDistribucion", Map.of(
+                "dentroLimite", tareasDentroDelLimite.size(),
+                "excedidas", tareasExcedidas.size()
+        ));
+
+        datosGraficos.put("contribucionesClientes", contribucionesSolucion);
+        datosGraficos.put("coberturaClientes", coberturaClientes);
+
+        datosGraficos.put("productividadTareas", tareasDentroDelLimite.stream()
+                .map(t -> Map.of(
+                        "nombre", t.getNombreTarea(),
+                        "productividad", t.getEsfuerzo() > 0 ? t.getValoracionPonderada() / t.getEsfuerzo() : 0.0
+                ))
+                .toList());
+
+        List<Map<String, Object>> esfuerzoSatisfaccionData = tareasDentroDelLimite.stream()
+                .map(t -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("esfuerzo", t.getEsfuerzo());
+                    map.put("satisfaccion", t.getValoracionPonderada());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        datosGraficos.put("esfuerzoVsSatisfaccion", esfuerzoSatisfaccionData);
+        datosGraficos.put("productividadTareas", tareasDentroDelLimite.stream()
+                .map(t -> Map.of(
+                        "nombre", t.getNombreTarea(),
+                        "productividad", t.getEsfuerzo() > 0 ? t.getValoracionPonderada() / t.getEsfuerzo() : 0.0
+                ))
+                .toList());
+
+        model.addAttribute("graficosData", convertirAJson(datosGraficos));
         model.addAttribute("tareasJson", convertirAJson(tareasDentroDelLimite));
         model.addAttribute("grafoDependencias", convertirAJson(grafoDependencias));
         model.addAttribute("proyecto", proyecto);

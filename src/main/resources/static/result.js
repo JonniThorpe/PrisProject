@@ -234,4 +234,125 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     modalDependenciasOverlay.addEventListener("click", cerrarModalDependenciasGrafo);
+
+    // Modal para cobertura
+    const modalVerDistribucion = document.getElementById("modalVerDistribucion");
+    const modalDistribucionOverlay = document.getElementById("modalDistribucionOverlay");
+
+    window.mostrarModalDistribucion = function () {
+        modalVerDistribucion.classList.add("show");
+        modalDistribucionOverlay.classList.add("show");
+    };
+
+    window.cerrarModalDistribucion = function () {
+        modalVerDistribucion.classList.remove("show");
+        modalDistribucionOverlay.classList.remove("show");
+    };
+
+    modalOverlay.addEventListener("click", cerrarModalDistribucion);
+
+    // Modal para cobertura
+    const modalVerContribuciones = document.getElementById("modalVerContribuciones");
+    const modalGraficoContribucionesOverlay = document.getElementById("modalGraficoContribucionesOverlay");
+
+    window.mostrarModalContribucionGrafico = function () {
+        modalVerContribuciones.classList.add("show");
+        modalGraficoContribucionesOverlay.classList.add("show");
+    };
+
+    window.cerrarModalContribucionGrafico = function () {
+        modalVerContribuciones.classList.remove("show");
+        modalGraficoContribucionesOverlay.classList.remove("show");
+    };
+
+    modalGraficoContribucionesOverlay.addEventListener("click", cerrarModalContribucionGrafico);
+
+    // Modal para Productividad
+    const modalVerProductividad = document.getElementById("modalVerProductividad");
+    const modalProductividadOverlay = document.getElementById("modalProductividadOverlay");
+
+    window.mostrarModalProductividad = function () {
+        modalVerProductividad.classList.add("show");
+        modalProductividadOverlay.classList.add("show");
+    }
+    window.cerrarModalProductividad = function () {
+        modalVerProductividad.classList.remove("show");
+        modalProductividadOverlay.classList.remove("show");
+    };
+
+    modalProductividadOverlay.addEventListener("click", cerrarModalContribucionGrafico);
+
+
+    // Modal para Esfuerzo vs Satisfacción
+    const modalVerEsfuerzoVsSatisfaccion = document.getElementById("modalVerEsfuerzoVsSatisfaccion");
+    const modalEsfuerzoVsSatisfaccionOverlay = document.getElementById("modalEsfuerzoVsSatisfaccionOverlay");
+
+    window.mostrarModalEsfuerzoVsSatisfaccion = function () {
+        modalVerEsfuerzoVsSatisfaccion.classList.add("show");
+        modalEsfuerzoVsSatisfaccionOverlay.classList.add("show");
+    }
+    window.cerrarModalEsfuerzoVsSatisfaccion = function () {
+        modalVerEsfuerzoVsSatisfaccion.classList.remove("show");
+        modalEsfuerzoVsSatisfaccionOverlay.classList.remove("show");
+    };
+
+    modalEsfuerzoVsSatisfaccionOverlay.addEventListener("click", cerrarModalEsfuerzoVsSatisfaccion);
+
+    try {
+        const graficosData = JSON.parse(document.getElementById("graficosData").textContent);
+        const productividadData = graficosData.productividadTareas;
+        const esfuerzoSatisfaccionData = graficosData.productividadTareas;
+        console.log("Datos de los gráficos:", graficosData);
+
+            // Gráfico de distribución
+            Highcharts.chart('graficoDistribucion', {
+                chart: { type: 'pie' },
+                title: { text: 'Distribución de Tareas' },
+                series: [{
+                    name: 'Tareas',
+                    data: [
+                        { name: 'Dentro del Límite', y: graficosData.tareasDistribucion.dentroLimite },
+                        { name: 'Excedidas', y: graficosData.tareasDistribucion.excedidas }
+                    ]
+                }]
+            });
+
+            // Gráfico de contribuciones
+            Highcharts.chart('graficoContribuciones', {
+                chart: { type: 'column' },
+                title: { text: 'Contribuciones de los Clientes' },
+                xAxis: { categories: graficosData.contribucionesClientes.map(c => c.cliente) },
+                series: [{
+                    name: 'Contribución',
+                    data: graficosData.contribucionesClientes.map(c => c.contribucion)
+                }]
+            });
+        Highcharts.chart('graficoProductividad', {
+            chart: { type: 'line' },
+            title: { text: 'Productividad de la Solución' },
+            xAxis: {
+                categories: productividadData.map(t => t.nombre),
+                title: { text: 'Tareas' }
+            },
+            yAxis: {
+                title: { text: 'Productividad' }
+            },
+            series: [{
+                name: 'Productividad',
+                data: productividadData.map(t => t.productividad)
+            }]
+        });
+        Highcharts.chart('graficoEsfuerzoVsSatisfaccion', {
+            chart: { type: 'scatter', zoomType: 'xy' },
+            title: { text: 'Esfuerzo vs Satisfacción' },
+            xAxis: { title: { text: 'Esfuerzo' } },
+            yAxis: { title: { text: 'Satisfacción' } },
+            series: [{
+                name: 'Tareas',
+                data: esfuerzoSatisfaccionData.map(t => [t.productividad, t.productividad * 10]) // Ajustar valores si son distintos
+            }]
+        });
+        } catch (error) {
+            console.error("Error al inicializar gráficos:", error);
+        }
 });

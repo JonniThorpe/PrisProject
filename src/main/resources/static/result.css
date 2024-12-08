@@ -232,7 +232,7 @@ button:hover {
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    margin: 0px 4em 0px 4em;
+    margin: 1em 4em 2em 4em;
 }
 
 #modalCambioTarea {
@@ -260,6 +260,30 @@ button:hover {
  }
 
 #modalDependenciasGrafo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que el modal esté encima */
+}
+
+#modalVerDistribucion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que el modal esté encima */
+}
+
+#modalVerContribuciones {
     position: fixed;
     top: 0;
     left: 0;
@@ -376,6 +400,9 @@ button:hover {
     button {
         font-size: 0.9rem;
         padding: 8px 16px;
+    }
+    .span-buttons {
+        margin: 1px 2em 2px 2em;
     }
 }
 
