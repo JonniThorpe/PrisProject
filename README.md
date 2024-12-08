@@ -138,5 +138,5 @@ Las contribuciones son bienvenidas. Si encuentras errores o deseas mejorar el si
 
 ---
 
-**ProTask**: Optimizando la gestión de proyectos, una tarea a la vez.  
+**ProTask**: Optimizando la gestión de proyectos. 
 ✨ ¡Gracias por usar ProTask! ✨
