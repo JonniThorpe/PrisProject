@@ -415,11 +415,13 @@ button:hover {
         overflow-x: auto;
     }
 
-    table {
-        font-size: 0.8rem;
-        width: 100%;
-        height: auto;
+    table tr {
+        display: flex;
+        flex-direction: column;
+
     }
+
+
 
     button {
         font-size: 0.8rem;
