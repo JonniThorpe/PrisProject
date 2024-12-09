@@ -235,54 +235,12 @@ button:hover {
     margin: 1em 4em 2em 4em;
 }
 
-#modalCambioTarea {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999; /* Asegura que el modal esté encima */
-}
-
- #modalVerGrafo {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-     justify-content: center;
-     align-items: center;
-     z-index: 9999; /* Asegura que el modal esté encima */
- }
-
-#modalDependenciasGrafo {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999; /* Asegura que el modal esté encima */
-}
-
-#modalVerDistribucion {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999; /* Asegura que el modal esté encima */
-}
-
+/* Modales */
+.modal,
+#modalCambioTarea,
+#modalVerGrafo,
+#modalDependenciasGrafo,
+#modalVerDistribucion,
 #modalVerContribuciones {
     position: fixed;
     top: 0;
@@ -295,17 +253,8 @@ button:hover {
     z-index: 9999; /* Asegura que el modal esté encima */
 }
 
-.modal {
+.modal{
     display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999; /* Asegura que el modal esté encima */
 }
 
 .modal-content {
@@ -365,7 +314,6 @@ button:hover {
     display: flex;
 }
 
-
 @keyframes scaleIn {
     from {
         transform: scale(0.9);
@@ -377,58 +325,65 @@ button:hover {
     }
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
-    header, main {
-        padding: 10px;
+    body {
+        font-size: 0.9rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
     }
 
     section {
-        padding: var(--padding-1);
+        padding: 1.2rem;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .span-buttons {
+        flex-direction: column;
+        gap: 15px;
+        margin: 1em 2em;
+    }
+
+    .back-svg {
+        width: 24px;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.8rem;
     }
 
     h1 {
         font-size: 1.4rem;
     }
 
-    table {
-        font-size: 0.9rem;
-        width: 100%;
-        height: auto;
-    }
-
-    button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-    }
-    .span-buttons {
-        margin: 1px 2em 2px 2em;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.2rem;
-    }
-
     .table-container {
-        overflow-x: auto;
+        overflow-x: scroll;
     }
 
-    table tr {
-        display: flex;
+    .span-buttons {
         flex-direction: column;
-
+        gap: 10px;
+        margin: 1em 1em;
     }
-
-
 
     button {
-        font-size: 0.8rem;
-        padding: 6px 12px;
+        font-size: 0.9rem;
+        padding: 8px;
     }
 
-    .modal-content {
-        padding: 15px;
+    .back-svg {
+        width: 20px;
     }
 }
