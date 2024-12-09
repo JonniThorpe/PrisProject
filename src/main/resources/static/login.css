@@ -126,21 +126,7 @@ input:focus {
     margin-left: auto;
     display: flex;
 }
-.floating-label .icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 56px;
-    width: 44px;
-    display: flex;
-}
-.floating-label .icon svg {
-    height: 30px;
-    width: 30px;
-    margin: auto;
-    opacity: 0.15;
-    transition: all 0.3s ease;
-}
+
 .floating-label .icon svg path {
     transition: all 0.3s ease;
 }
@@ -207,6 +193,16 @@ input:focus {
     margin: 20px;
 }
 
+.error{
+    display: flex;
+    align-content: center;
+}
+
+.error p{
+    margin: 0;
+    padding-top: 1em;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .session {
@@ -216,6 +212,7 @@ input:focus {
         max-width: 100%;
         box-shadow: none;
         border-radius: 0;
+        padding: 10px
     }
     .left {
         width: 100%;
@@ -227,9 +224,14 @@ input:focus {
     form {
         width: 90%;
         padding: 20px;
+        align-items: center;
+        text-align: center;
     }
-    h4 {
+    h4{
         font-size: 20px;
+    }
+    form h4, form p{
+    text-align: left;
     }
     button {
         font-size: 0.9rem;
@@ -241,13 +243,17 @@ input:focus {
         padding: 15px 0;
         width: 100%;
     }
+    button{
+        margin: 0;
+        }
+
+       form p{
+         max-width: 30em;
+            }
 }
 
 @media (max-width: 480px) {
-    .session {
-        padding: 10px;
-        box-shadow: none;
-    }
+
     h4 {
         font-size: 18px;
     }
@@ -263,5 +269,9 @@ input:focus {
         font-size: 13px;
         height: 45px;
         padding: 10px 0;
+    }
+
+    .floating-label input{
+        margin: 0;
     }
 }
